@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apple x Gemini 设计系统 - 深蓝/紫色调 + 苹果极简白 */
+:root {
+  /* Light Mode: 干净白/浅灰，点缀 Gemini 蓝紫 */
+  --surface: 0 0% 100%;
+  --surface-light: 220 14% 98%;
+  --surface-dark: 250 25% 8%;
+  --surface-dark-elevated: 250 22% 12%;
+  --text: 250 20% 10%;
+  --text-muted: 250 10% 46%;
+  --accent: 260 70% 55%;
+  --accent-muted: 260 30% 90%;
+  --border: 250 13% 91%;
+  --glass: 0 0% 100% / 0.7;
+}
+
+.dark {
+  /* Dark Mode: 深邃黑/深蓝紫 */
+  --surface: 250 25% 8%;
+  --surface-light: 250 22% 12%;
+  --surface-dark: 250 30% 4%;
+  --surface-dark-elevated: 250 22% 10%;
+  --text: 250 14% 96%;
+  --text-muted: 250 10% 68%;
+  --accent: 270 75% 65%;
+  --accent-muted: 260 30% 22%;
+  --border: 250 15% 18%;
+  --glass: 250 25% 10% / 0.8;
+}
+
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  html {
+    height: 100%;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: auto;
+  }
+  body {
+    min-height: 100%;
+    overflow-x: hidden;
+    @apply antialiased;
+    background-color: hsl(var(--surface));
+    color: hsl(var(--text));
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* 滚动吸附 - 阻尼感 */
+.scroll-snap-y {
+  scroll-snap-type: y mandatory;
+}
+
+.scroll-snap-start {
+  scroll-snap-align: start;
+}
+
+.scroll-snap-center {
+  scroll-snap-align: center;
+}
