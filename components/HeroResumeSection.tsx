@@ -59,7 +59,9 @@ function HeroContent({
           style={{ y, opacity, filter: blurFilter }}
           className="absolute inset-0 flex flex-col items-center justify-center px-6"
         >
-          <SharedAvatar layoutId="hero-avatar" isResume={false} />
+          <div className="flex-shrink-0 w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64">
+            <SharedAvatar layoutId="hero-avatar" isResume={false} />
+          </div>
           <SharedName layoutId="hero-name" isResume={false} />
           <p className="mt-4 max-w-md text-center text-lg text-[hsl(var(--text-muted))] sm:text-xl">
             全栈工程师 · 创造简洁而富有质感的产品
@@ -118,28 +120,40 @@ function SharedAvatar({ layoutId, isResume }: { layoutId: string; isResume: bool
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={
         isResume
-          ? "relative h-28 w-28 overflow-hidden rounded-2xl md:h-32 md:w-32"
-          : "relative h-40 w-40 overflow-hidden rounded-full sm:h-52 sm:w-52 md:h-64 md:w-64"
-      }
-      whileHover={
-        !isResume
-          ? {
-              scale: 1.06,
-              y: -8,
-              boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1)",
-              transition: { duration: 0.2 },
-            }
-          : undefined
+          ? "relative h-28 w-28 flex-shrink-0 overflow-visible md:h-32 md:w-32"
+          : "relative h-full w-full flex-shrink-0 overflow-visible"
       }
     >
-      <Image
-        src={AVATAR_SRC}
-        alt="个人头像"
-        fill
-        className="object-cover"
-        priority={!isResume}
-        sizes={isResume ? "128px" : "256px"}
-      />
+      <motion.div
+        layout={false}
+        className="absolute inset-0 flex items-center justify-center"
+        style={{ transformOrigin: "center center" }}
+        whileHover={
+          !isResume
+            ? {
+                y: -8,
+                transition: { duration: 0.2 },
+              }
+            : undefined
+        }
+      >
+        <div
+          className={
+            isResume
+              ? "relative aspect-square h-full w-full overflow-hidden rounded-2xl"
+              : "relative aspect-square h-full w-full overflow-hidden rounded-full"
+          }
+        >
+          <Image
+            src={AVATAR_SRC}
+            alt="个人头像"
+            fill
+            className="object-cover"
+            priority={!isResume}
+            sizes={isResume ? "128px" : "256px"}
+          />
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
