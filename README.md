@@ -25,7 +25,7 @@
 
 1. 克隆这个仓库到本地：
 ```bash
-git clone [https://github.com/你的用户名/你的仓库名.git](https://github.com/你的用户名/你的仓库名.git)
+git clone https://github.com/Guanghao-Li/guanghaoli-blog
 ```
 
 2. 进入项目目录并安装依赖：
