@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ImageCropper from "./ImageCropper";
 
 export default function HeroSettings() {
   const [name, setName] = useState("");
   const [nameZh, setNameZh] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [subtitleZh, setSubtitleZh] = useState("");
+  const [avatar, setAvatar] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -18,6 +20,7 @@ export default function HeroSettings() {
         setNameZh(d.hero?.nameZh ?? "");
         setSubtitle(d.hero?.subtitle ?? "");
         setSubtitleZh(d.hero?.subtitleZh ?? "");
+        setAvatar(d.hero?.avatar ?? "");
       })
       .catch(console.error);
   }, []);
@@ -27,7 +30,7 @@ export default function HeroSettings() {
     setSaved(false);
     try {
       const data = await fetch("/api/admin/cms").then((r) => r.json());
-      data.hero = { name, nameZh, subtitle, subtitleZh };
+      data.hero = { name, nameZh, subtitle, subtitleZh, avatar: avatar || undefined };
       await fetch("/api/admin/cms", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -44,6 +47,12 @@ export default function HeroSettings() {
 
   return (
     <div className="mt-6 max-w-xl space-y-4">
+      <ImageCropper
+        value={avatar}
+        onChange={setAvatar}
+        aspect={1}
+        label="头像 (Avatar)"
+      />
       <div>
         <label className="block text-sm font-medium">姓名 (英文)</label>
         <input

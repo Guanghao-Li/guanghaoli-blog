@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import Image from "next/image";
 import { useScrollSection } from "@/contexts/ScrollSectionContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCmsResume } from "@/contexts/CmsContext";
+import { useCmsResume, useCmsHero } from "@/contexts/CmsContext";
 import { getResumeData } from "@/lib/resume-data";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -277,6 +277,10 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
 }
 
 function SharedAvatar({ layoutId, isResume }: { layoutId: string; isResume: boolean }) {
+  const hero = useCmsHero();
+  const avatarSrc = hero?.avatar || AVATAR_SRC;
+  const isDataUrl = avatarSrc.startsWith("data:");
+
   return (
     <motion.div
       layoutId={layoutId}
@@ -304,14 +308,22 @@ function SharedAvatar({ layoutId, isResume }: { layoutId: string; isResume: bool
               : "relative aspect-square h-full w-full overflow-hidden rounded-full"
           }
         >
-          <Image
-            src={AVATAR_SRC}
-            alt="Avatar"
-            fill
-            className="object-cover"
-            priority={!isResume}
-            sizes={isResume ? "128px" : "256px"}
-          />
+          {isDataUrl ? (
+            <img
+              src={avatarSrc}
+              alt="Avatar"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <Image
+              src={avatarSrc}
+              alt="Avatar"
+              fill
+              className="object-cover"
+              priority={!isResume}
+              sizes={isResume ? "128px" : "256px"}
+            />
+          )}
         </div>
       </motion.div>
     </motion.div>

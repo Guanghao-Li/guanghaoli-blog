@@ -10,14 +10,24 @@ import {
 import { PROJECTS, type Project } from "@/lib/projects-data";
 import type { ResumeData } from "@/lib/resume-types";
 
+interface HeroData {
+  name?: string;
+  nameZh?: string;
+  subtitle?: string;
+  subtitleZh?: string;
+  avatar?: string;
+}
+
 interface CmsDataResponse {
   projects?: Project[];
   resume?: ResumeData;
+  hero?: HeroData;
 }
 
 const CmsContext = createContext<{
   projects: Project[];
   resume: ResumeData | null;
+  hero: HeroData | null;
   refresh: () => void;
 } | null>(null);
 
@@ -31,6 +41,7 @@ const DEFAULT_RESUME: ResumeData = {
 export function CmsProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>(PROJECTS);
   const [resume, setResume] = useState<ResumeData | null>(null);
+  const [hero, setHero] = useState<HeroData | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -43,6 +54,9 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
       if (data.resume) {
         setResume(data.resume);
       }
+      if (data.hero) {
+        setHero(data.hero);
+      }
     } catch {
       // Keep fallbacks
     }
@@ -53,7 +67,7 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   return (
-    <CmsContext.Provider value={{ projects, resume, refresh }}>
+    <CmsContext.Provider value={{ projects, resume, hero, refresh }}>
       {children}
     </CmsContext.Provider>
   );
@@ -67,4 +81,9 @@ export function useCmsProjects() {
 export function useCmsResume(): ResumeData | null {
   const ctx = useContext(CmsContext);
   return ctx?.resume ?? null;
+}
+
+export function useCmsHero(): HeroData | null {
+  const ctx = useContext(CmsContext);
+  return ctx?.hero ?? null;
 }

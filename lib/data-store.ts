@@ -11,6 +11,8 @@ export interface CmsData {
     nameZh: string;
     subtitle: string;
     subtitleZh: string;
+    /** Base64 Data URL 头像，由后台 ImageCropper 上传 */
+    avatar?: string;
   };
   resume: ResumeData;
   projects: Array<{
