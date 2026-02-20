@@ -1,26 +1,44 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import MarkdownContent from "./MarkdownContent";
+import type { Lang } from "@/contexts/LanguageContext";
+
+export interface ProjectUiSettings {
+  titleSize?: string;
+  titleLeftOffsetPercent?: number;
+  contentWidthPercent?: number;
+}
 
 export interface Project {
   id: string;
   title: string;
+  titleZh: string;
   description: string;
+  descriptionZh: string;
   tags: string[];
   size: "large" | "medium";
+  markdownEn?: string;
+  markdownZh?: string;
+  markdown?: string;
+  uiSettings?: ProjectUiSettings;
 }
 
 export function ProjectCardGrid({
   project,
   layoutId,
   onClick,
+  lang,
 }: {
   project: Project;
   layoutId: string;
   onClick: () => void;
+  lang: Lang;
 }) {
+  const title = (lang === "zh" ? project.titleZh : project.title) || (lang === "zh" ? project.title : project.titleZh);
+  const desc = (lang === "zh" ? project.descriptionZh : project.description) || (lang === "zh" ? project.description : project.descriptionZh);
+
   return (
     <motion.article
       layoutId={layoutId}
@@ -33,13 +51,13 @@ export function ProjectCardGrid({
         project.size === "large" && "md:col-span-2"
       )}
       whileHover={{
-        scale: 1.05,
+        scale: 1.02,
         boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px hsl(var(--border))",
       }}
-      whileTap={{ scale: 1.02 }}
+      whileTap={{ scale: 1.01 }}
     >
-      <h3 className="text-xl font-semibold md:text-2xl">{project.title}</h3>
-      <p className="mt-3 text-[hsl(var(--text-muted))]">{project.description}</p>
+      <h3 className="text-xl font-semibold md:text-2xl">{title}</h3>
+      <p className="mt-3 text-[hsl(var(--text-muted))]">{desc}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {project.tags.map((tag) => (
           <span
@@ -57,34 +75,72 @@ export function ProjectCardGrid({
 export function ProjectCardExpanded({
   project,
   layoutId,
-  onClose,
+  lang,
 }: {
   project: Project;
   layoutId: string;
-  onClose: () => void;
+  onClose?: () => void;
+  lang: Lang;
 }) {
+  const title = (lang === "zh" ? project.titleZh : project.title) || (lang === "zh" ? project.title : project.titleZh);
+  const ui = project.uiSettings ?? {};
+  const titleSize = ui.titleSize ?? "text-2xl md:text-3xl";
+  const titleOffset = ui.titleLeftOffsetPercent ?? 12.5; // pl-32 ≈ 8rem ≈ 12.5% of 1280px
+  const contentWidth = ui.contentWidthPercent ?? 70;
+
   return (
     <motion.div
       layoutId={layoutId}
       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-      className="relative mx-4 max-h-[90vh] w-full max-w-2xl overflow-auto rounded-3xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] p-8 shadow-2xl dark:bg-[hsl(var(--surface-dark-elevated))]"
+      className={cn(
+        "fixed inset-0 z-[95] overflow-y-auto",
+        "bg-[hsl(var(--surface))] dark:bg-[hsl(var(--surface-dark-elevated))]"
+      )}
     >
-      <button
-        onClick={onClose}
-        className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-[hsl(var(--accent-muted))] hover:bg-[hsl(var(--accent))] hover:text-white"
-        aria-label="关闭"
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="pt-12 pb-8 pr-6 text-left"
+        style={{ paddingLeft: `max(8rem, ${titleOffset}%)` }}
       >
-        <X className="h-5 w-5" />
-      </button>
-      <div className="pt-12">
-        <motion.h2 layoutId={`${layoutId}-title`} className="text-center text-2xl font-bold md:text-3xl">
-          {project.title}
+        <motion.h2
+          layoutId={`${layoutId}-title`}
+          className={cn(titleSize, "font-bold tracking-tight")}
+        >
+          {title}
         </motion.h2>
-        <div className="mt-6 space-y-4 text-[hsl(var(--text-muted))]">
-          <p>{project.description}</p>
-          <p className="text-sm">二级页面占位内容 · 可在此添加项目详情、截图、技术栈等。</p>
+        <div className="mt-3 flex flex-wrap gap-2 justify-start">
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-md bg-[hsl(var(--accent-muted))] px-3 py-1 text-sm font-medium"
+            >
+              {tag}
+            </span>
+          ))}
         </div>
-      </div>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="mx-auto pb-24"
+        style={{
+          width: `${contentWidth}%`,
+          paddingLeft: `max(8rem, ${titleOffset}%)`,
+        }}
+      >
+        <article className="prose prose-zinc dark:prose-invert max-w-none prose-headings:font-semibold prose-pre:rounded-xl prose-pre:!bg-zinc-800 prose-pre:!text-zinc-100 prose-code:before:content-none prose-code:after:content-none prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:!bg-zinc-800 prose-code:!text-zinc-100">
+          <MarkdownContent
+            content={
+              lang === "zh"
+                ? (project.markdownZh ?? project.markdown ?? "")
+                : (project.markdownEn ?? project.markdown ?? "")
+            }
+          />
+        </article>
+      </motion.div>
     </motion.div>
   );
 }

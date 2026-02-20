@@ -39,9 +39,6 @@
   }
   html {
     height: 100%;
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
-    overflow-y: auto;
   }
   body {
     min-height: 100%;
@@ -53,15 +50,21 @@
   }
 }
 
-/* 滚动吸附 - 阻尼感 */
-.scroll-snap-y {
+/* 原生 CSS 滚动吸附 - 强制卡扣感 */
+.scroll-snap-container {
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
   scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
-.scroll-snap-start {
+.scroll-snap-section {
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   scroll-snap-align: start;
-}
-
-.scroll-snap-center {
-  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  position: relative;
 }

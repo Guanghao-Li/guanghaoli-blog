@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ScrollSectionProvider } from "@/contexts/ScrollSectionContext";
-import Dock from "@/components/Dock";
-import ThemeToggle from "@/components/ThemeToggle";
-import HamburgerMenu from "@/components/HamburgerMenu";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ProjectDetailProvider } from "@/contexts/ProjectDetailContext";
+import { CmsProvider } from "@/contexts/CmsContext";
+import SiteChrome from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
   title: "Lee | 作品集",
-  description: "全栈工程师 · 创造简洁而富有质感的产品",
+  description: "嵌入式系统工程师 · Embedded Systems Engineer",
 };
 
 export default function RootLayout({
@@ -34,16 +35,18 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider>
-          <ScrollSectionProvider>
-            <div className="relative min-h-full w-full">
-              <HamburgerMenu />
-              <header className="fixed right-4 top-4 z-40">
-                <ThemeToggle />
-              </header>
-              {children}
-              <Dock />
-            </div>
-          </ScrollSectionProvider>
+          <LanguageProvider>
+            <CmsProvider>
+              <ScrollSectionProvider>
+                <ProjectDetailProvider>
+                <div className="relative min-h-full w-full">
+                  <SiteChrome />
+                  {children}
+                </div>
+                </ProjectDetailProvider>
+              </ScrollSectionProvider>
+            </CmsProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

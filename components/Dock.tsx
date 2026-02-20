@@ -1,24 +1,38 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { Home, FileText, FolderOpen, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useProjectDetail } from "@/contexts/ProjectDetailContext";
 
 const NAV_ITEMS = [
-  { id: "home", label: "Home", icon: Home, href: "#" },
+  { id: "hero", label: "Home", icon: Home, href: "#hero" },
   { id: "resume", label: "Resume", icon: FileText, href: "#resume" },
   { id: "projects", label: "Projects", icon: FolderOpen, href: "#projects" },
   { id: "lab", label: "Lab", icon: FlaskConical, href: "#lab" },
 ];
 
 export default function Dock() {
+  const { selectedId } = useProjectDetail();
+  const isProjectOpen = Boolean(selectedId);
+
   const handleClick = (href: string) => {
-    if (href === "#") window.scrollTo({ top: 0, behavior: "smooth" });
-    else document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <nav className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2" role="navigation">
-      <div
+    <AnimatePresence mode="wait">
+      {!isProjectOpen && (
+        <motion.nav
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
+          role="navigation"
+        >
+          <div
         className={cn(
           "flex items-center gap-2 rounded-full px-5 py-3",
           "border border-[hsl(var(--border))]",
@@ -43,7 +57,9 @@ export default function Dock() {
             </button>
           );
         })}
-      </div>
-    </nav>
+          </div>
+        </motion.nav>
+      )}
+    </AnimatePresence>
   );
 }

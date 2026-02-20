@@ -1,0 +1,131 @@
+{
+  "hero": {
+    "name": "Guanghao Li",
+    "nameZh": "李光浩",
+    "subtitle": "Embedded Systems Engineer",
+    "subtitleZh": "嵌入式系统工程师 / Embedded Systems Engineer"
+  },
+  "resume": {
+    "nameEn": "Guanghao Li",
+    "nameZh": "李光浩",
+    "basicInfo": [
+      {
+        "id": "1",
+        "labelEn": "Location",
+        "labelZh": "居住地",
+        "valueEn": "Hoboken, NJ",
+        "valueZh": "湖北武汉"
+      },
+      {
+        "id": "2",
+        "labelEn": "Phone",
+        "labelZh": "电话",
+        "valueEn": "+1 5513879325",
+        "valueZh": "+86 18976620394"
+      },
+      {
+        "id": "3",
+        "labelEn": "Email",
+        "labelZh": "邮箱",
+        "valueEn": "gli42@stevens.edu",
+        "valueZh": "leegh2248@outlook.com"
+      }
+    ],
+    "sections": [
+      {
+        "id": "edu",
+        "titleEn": "Education",
+        "titleZh": "教育背景",
+        "order": 0,
+        "items": [
+          {
+            "id": "1771558771354",
+            "period": "2025-2026",
+            "title": "史蒂文斯理工学院",
+            "subtitle": "电气工程    工程硕士",
+            "contentMarkdown": ""
+          },
+          {
+            "id": "1771558772866",
+            "period": "2025-2026",
+            "title": "Stevens",
+            "subtitle": "",
+            "contentMarkdown": ""
+          }
+        ]
+      },
+      {
+        "id": "work",
+        "titleEn": "Work Experience",
+        "titleZh": "工作经历",
+        "order": 1,
+        "items": []
+      },
+      {
+        "id": "skills",
+        "titleEn": "Skills",
+        "titleZh": "专业技能",
+        "order": 2,
+        "items": []
+      },
+      {
+        "id": "1771558768658",
+        "titleEn": "",
+        "titleZh": "",
+        "order": 0,
+        "items": []
+      }
+    ]
+  },
+  "projects": [
+    {
+      "id": "1",
+      "title": "Smart Home Control Center",
+      "titleZh": "智能家居控制中心",
+      "description": "IoT-based smart home management system with multi-device linking and scene orchestration.",
+      "descriptionZh": "基于 Next.js 与 IoT 的智能家居管理系统，支持多设备联动与场景编排。",
+      "tags": [
+        "Next.js",
+        "TypeScript",
+        "IoT",
+        "Framer Motion"
+      ],
+      "size": "large",
+      "markdown": "## 项目概述\n\n基于 **Next.js** 与 **IoT** 的智能家居管理系统，支持多设备联动与场景编排。\n\n### 技术栈\n\n- Next.js 14 (App Router)\n- TypeScript\n- Framer Motion\n- MQTT / WebSocket\n\n### 核心功能\n\n1. 设备发现与配对\n2. 场景自动化编排\n3. 实时状态同步\n\n### 示例代码\n\n```typescript\nconst handleDeviceToggle = async (id: string) => {\n  await fetch(`/api/devices/${id}/toggle`, { method: 'POST' });\n};\n```"
+    },
+    {
+      "id": "2",
+      "title": "Design System Component Library",
+      "titleZh": "设计系统组件库",
+      "description": "Reusable UI component library following Apple HIG design guidelines.",
+      "descriptionZh": "可复用的 UI 组件库，遵循 Apple HIG 设计规范。",
+      "tags": [
+        "React",
+        "Tailwind",
+        "Storybook"
+      ],
+      "size": "medium",
+      "markdown": "## 设计系统组件库\n\n可复用的 UI 组件库，遵循 **Apple HIG** 设计规范。\n\n### 组件分类\n\n- **Buttons** — 多种尺寸与变体\n- **Cards** — Bento 风格布局\n- **Forms** — 表单控件与校验\n\n### 示例代码\n\n```tsx\n<Button variant=\"primary\" size=\"lg\">\n  Get Started\n</Button>\n```"
+    },
+    {
+      "id": "3",
+      "title": "Data Visualization Dashboard",
+      "titleZh": "数据可视化 Dashboard",
+      "description": "Real-time data display and chart analysis with multi-source integration.",
+      "descriptionZh": "实时数据展示与图表分析，支持多数据源接入。",
+      "tags": [
+        "Chart.js",
+        "WebSocket",
+        "Node.js"
+      ],
+      "size": "medium",
+      "markdown": "## 数据可视化 Dashboard\n\n实时数据展示与图表分析，支持多数据源接入。\n\n### 特性\n\n- **Chart.js** 图表\n- **WebSocket** 实时推送\n- **Node.js** 后端 API\n\n### 示例代码\n\n```javascript\nconst chart = new Chart(ctx, {\n  type: 'line',\n  data: { labels, datasets }\n});\n```"
+    }
+  ],
+  "iot": {
+    "title": "IoT Dashboard",
+    "titleZh": "IoT Dashboard",
+    "description": "Reserved visualization area for future MCU data",
+    "descriptionZh": "为未来单片机数据预留的可视化区域"
+  }
+}
