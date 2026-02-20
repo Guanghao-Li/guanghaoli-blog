@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadCmsData } from "@/lib/data-store";
+import { loadCmsData } from "@/lib/cms-db";
 
 export async function GET() {
   try {

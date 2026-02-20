@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { loadCmsData, saveCmsData, type CmsData } from "@/lib/data-store";
+import { revalidatePath } from "next/cache";
+import { loadCmsData, saveCmsData } from "@/lib/cms-db";
+import type { CmsData } from "@/lib/data-store";
 
 export async function GET() {
   try {
@@ -15,6 +17,7 @@ export async function PUT(request: Request) {
   try {
     const data: CmsData = await request.json();
     await saveCmsData(data);
+    revalidatePath("/", "layout");
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error(e);

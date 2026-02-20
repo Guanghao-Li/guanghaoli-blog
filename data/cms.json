@@ -8,7 +8,7 @@
   },
   "resume": {
     "nameEn": "Guanghao Li",
-    "nameZh": "李光浩",
+    "nameZh": "李光浩1",
     "basicInfo": [
       {
         "id": "1",
@@ -36,7 +36,7 @@
       {
         "id": "edu",
         "titleEn": "Education",
-        "titleZh": "教育背景",
+        "titleZh": "教育背景1",
         "order": 0,
         "items": [
           {
@@ -64,20 +64,30 @@
             "subtitleZh": "",
             "contentMarkdownEn": "",
             "contentMarkdownZh": ""
+          },
+          {
+            "id": "1771571719541",
+            "period": "1",
+            "titleEn": "",
+            "titleZh": "",
+            "subtitleEn": "",
+            "subtitleZh": "",
+            "contentMarkdownEn": "",
+            "contentMarkdownZh": ""
           }
         ]
       },
       {
         "id": "work",
         "titleEn": "Work Experience",
-        "titleZh": "工作经历",
+        "titleZh": "工作经历1",
         "order": 1,
         "items": []
       },
       {
         "id": "skills",
         "titleEn": "Skills",
-        "titleZh": "专业技能",
+        "titleZh": "专业技能1",
         "order": 2,
         "items": []
       },

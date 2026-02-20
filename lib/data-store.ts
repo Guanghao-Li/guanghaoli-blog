@@ -1,9 +1,5 @@
-import { promises as fs } from "fs";
-import path from "path";
 import { PROJECTS } from "./projects-data";
 import type { ResumeData } from "./resume-types";
-
-const DATA_PATH = path.join(process.cwd(), "data", "cms.json");
 
 export interface CmsData {
   hero: {
@@ -11,7 +7,6 @@ export interface CmsData {
     nameZh: string;
     subtitle: string;
     subtitleZh: string;
-    /** Base64 Data URL 头像，由后台 ImageCropper 上传 */
     avatar?: string;
   };
   resume: ResumeData;
@@ -40,7 +35,7 @@ export interface CmsData {
   };
 }
 
-const DEFAULT_DATA: CmsData = {
+export const DEFAULT_DATA: CmsData = {
   hero: {
     name: "Guanghao Li",
     nameZh: "李光浩",
@@ -98,14 +93,13 @@ function migrateResumeItems(r: ResumeData): ResumeData {
   };
 }
 
-function migrateResume(parsed: any): ResumeData {
+export function migrateResume(parsed: any): ResumeData {
   const def = DEFAULT_DATA.resume;
   const r = parsed?.resume;
   if (!r) return def;
   if (Array.isArray(r.basicInfo) && Array.isArray(r.sections)) {
     return migrateResumeItems(r as ResumeData);
   }
-  // Migrate old structure
   const basicInfo = [
     { id: "1", labelEn: "Location", labelZh: "居住地", valueEn: r.personal?.en?.location ?? "", valueZh: r.personal?.zh?.location ?? "" },
     { id: "2", labelEn: "Phone", labelZh: "电话", valueEn: r.personal?.en?.phone ?? "", valueZh: r.personal?.zh?.phone ?? "" },
@@ -159,7 +153,7 @@ function migrateResume(parsed: any): ResumeData {
   };
 }
 
-function migrateProjects(projects: any[]): CmsData["projects"] {
+export function migrateProjects(projects: any[]): CmsData["projects"] {
   return projects.map((p: any) => {
     const legacyMd = p.markdown ?? "";
     return {
@@ -168,28 +162,4 @@ function migrateProjects(projects: any[]): CmsData["projects"] {
       markdownZh: p.markdownZh ?? legacyMd,
     };
   });
-}
-
-export async function loadCmsData(): Promise<CmsData> {
-  try {
-    const raw = await fs.readFile(DATA_PATH, "utf-8");
-    const parsed = JSON.parse(raw);
-    return {
-      ...DEFAULT_DATA,
-      ...parsed,
-      resume: migrateResume(parsed),
-      projects: migrateProjects(
-      Array.isArray(parsed.projects) && parsed.projects.length > 0
-        ? parsed.projects
-        : DEFAULT_DATA.projects
-    ),
-    };
-  } catch {
-    return DEFAULT_DATA;
-  }
-}
-
-export async function saveCmsData(data: CmsData): Promise<void> {
-  await fs.mkdir(path.dirname(DATA_PATH), { recursive: true });
-  await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), "utf-8");
 }
