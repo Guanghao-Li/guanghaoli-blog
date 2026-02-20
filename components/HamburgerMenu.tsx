@@ -5,10 +5,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useProjectDetail } from "@/contexts/ProjectDetailContext";
 
 export default function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { lang, setLang, t } = useLanguage();
+  const { selectedId } = useProjectDetail();
+  const isSecondaryPage = Boolean(selectedId);
 
   const toggleLang = () => setLang(lang === "en" ? "zh" : "en");
 
@@ -38,7 +41,10 @@ export default function HamburgerMenu() {
             />
             <motion.div
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
+              animate={{
+                opacity: 1,
+                x: isSecondaryPage ? 80 : 0,
+              }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
               className="fixed left-4 top-4 z-[100] w-72 overflow-visible rounded-3xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] p-6 shadow-2xl dark:bg-[hsl(var(--surface-dark-elevated))]"
