@@ -142,11 +142,25 @@ const PROJECTS_ZH: ProjectPlaceholder[] = [
   },
 ];
 
-const SKILLS_EN =
-  "Full-stack Development · TypeScript · React · Next.js · IoT · Data Visualization · C/C++";
+const SKILLS_EN = [
+  "Full-stack Development",
+  "TypeScript",
+  "React",
+  "Next.js",
+  "IoT",
+  "Data Visualization",
+  "C/C++",
+];
 
-const SKILLS_ZH =
-  "全栈开发 · TypeScript · React · Next.js · IoT · 数据可视化 · C/C++";
+const SKILLS_ZH = [
+  "全栈开发",
+  "TypeScript",
+  "React",
+  "Next.js",
+  "IoT",
+  "数据可视化",
+  "C/C++",
+];
 
 export function getResumeData(lang: Lang): ResumeData {
   return {

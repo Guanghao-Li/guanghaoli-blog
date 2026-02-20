@@ -265,7 +265,7 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
                   ))}
                 </ResumeBlock>
                 <ResumeBlock title={lang === "zh" ? "专业技能" : "Skills"}>
-                  <p>{fallbackData.skills}</p>
+                  <p>{fallbackData.skills.join(" · ")}</p>
                 </ResumeBlock>
               </>
             )}
