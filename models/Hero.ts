@@ -8,6 +8,12 @@ const HeroSchema = new mongoose.Schema(
     subtitle: { type: String, default: "" },
     subtitleZh: { type: String, default: "" },
     avatar: { type: String, default: undefined },
+    phone: { type: String, default: "" },
+    email: { type: String, default: "" },
+    address: { type: String, default: "" },
+    infoFontSize: { type: Number, default: 14 },
+    infoPositionX: { type: Number, default: 0 },
+    infoPositionY: { type: Number, default: 0 },
   },
   { _id: true, timestamps: false }
 );
@@ -26,6 +32,12 @@ export async function upsertHero(data: {
   subtitle?: string;
   subtitleZh?: string;
   avatar?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  infoFontSize?: number;
+  infoPositionX?: number;
+  infoPositionY?: number;
 }) {
   await connectDB();
   const doc = await Hero.findOneAndUpdate(

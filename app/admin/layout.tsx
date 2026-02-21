@@ -18,7 +18,7 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-zinc-100 dark:bg-zinc-900">
       <AdminNav />
-      <main className="flex-1 overflow-auto p-8">{children}</main>
+      <main className="flex-1 overflow-auto p-4 pt-16 md:p-8 md:pt-8 md:pl-8">{children}</main>
     </div>
   );
 }

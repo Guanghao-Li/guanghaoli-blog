@@ -241,9 +241,9 @@ requests.post(url, json=payload)`;
         <button
           onClick={save}
           disabled={saving}
-          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+          className="rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 min-h-[44px] touch-manipulation"
         >
-          {saving ? "保存中..." : saved ? "保存成功" : "保存更改"}
+          {saving ? "保存中..." : saved ? "保存成功" : "保存修改"}
         </button>
         <button
           onClick={clearData}

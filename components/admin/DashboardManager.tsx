@@ -78,7 +78,7 @@ export default function DashboardManager() {
   return (
     <div className="mt-6 max-w-2xl space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">添加 Widget</h2>
+        <h2 className="text-lg font-medium">添加组件</h2>
         <div className="flex gap-2">
           {WIDGET_TYPES.map(({ value, label }) => (
             <button
@@ -248,9 +248,9 @@ export default function DashboardManager() {
       <button
         onClick={save}
         disabled={saving}
-        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900"
+        className="rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 min-h-[44px] touch-manipulation"
       >
-        {saving ? "保存中..." : "保存更改"}
+        {saving ? "保存中..." : "保存修改"}
       </button>
     </div>
   );

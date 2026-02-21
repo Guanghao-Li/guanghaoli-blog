@@ -13,6 +13,12 @@ function toHeroPayload(hero: CmsData["hero"]) {
     subtitle: hero?.subtitle ?? DEFAULT_DATA.hero.subtitle,
     subtitleZh: hero?.subtitleZh ?? DEFAULT_DATA.hero.subtitleZh,
     ...(hero?.avatar !== undefined && { avatar: hero.avatar }),
+    phone: hero?.phone ?? "",
+    email: hero?.email ?? "",
+    address: hero?.address ?? "",
+    infoFontSize: hero?.infoFontSize ?? 14,
+    infoPositionX: hero?.infoPositionX ?? 0,
+    infoPositionY: hero?.infoPositionY ?? 0,
   };
 }
 
@@ -88,6 +94,12 @@ export async function loadCmsData(): Promise<CmsData> {
         subtitle: heroDoc.subtitle ?? DEFAULT_DATA.hero.subtitle,
         subtitleZh: heroDoc.subtitleZh ?? DEFAULT_DATA.hero.subtitleZh,
         ...(heroDoc.avatar && { avatar: heroDoc.avatar }),
+        phone: heroDoc.phone ?? "",
+        email: heroDoc.email ?? "",
+        address: heroDoc.address ?? "",
+        infoFontSize: heroDoc.infoFontSize ?? 14,
+        infoPositionX: heroDoc.infoPositionX ?? 0,
+        infoPositionY: heroDoc.infoPositionY ?? 0,
       }
     : DEFAULT_DATA.hero;
 

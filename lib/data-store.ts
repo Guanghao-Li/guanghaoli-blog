@@ -9,6 +9,12 @@ export interface CmsData {
     subtitle: string;
     subtitleZh: string;
     avatar?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    infoFontSize?: number;
+    infoPositionX?: number;
+    infoPositionY?: number;
   };
   resume: ResumeData;
   projects: Array<{
@@ -65,6 +71,12 @@ export const DEFAULT_DATA: CmsData = {
     nameZh: "李光浩",
     subtitle: "Embedded Systems Engineer",
     subtitleZh: "嵌入式系统工程师 / Embedded Systems Engineer",
+    phone: "",
+    email: "",
+    address: "",
+    infoFontSize: 14,
+    infoPositionX: 0,
+    infoPositionY: 0,
   },
   resume: {
     nameEn: "Guanghao Li",

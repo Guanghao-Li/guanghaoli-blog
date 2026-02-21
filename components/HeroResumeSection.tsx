@@ -55,6 +55,7 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
   const { lang, t } = useLanguage();
+  const hero = useCmsHero();
 
   useEffect(() => {
     scrollContainerRef.current = document.querySelector(".scroll-snap-container");
@@ -71,8 +72,13 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const blur = useTransform(scrollYProgress, [0, 0.4, 0.7], [0, 4, 12]);
   const blurFilter = useTransform(blur, (v) => `blur(${v}px)`);
 
+  const fontSize = hero?.infoFontSize ?? 14;
+  const posX = hero?.infoPositionX ?? 0;
+  const posY = hero?.infoPositionY ?? 0;
+  const hasContact = !!(hero?.phone || hero?.email || hero?.address);
+
   return (
-    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-10">
+    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-16 md:-translate-y-20">
       <div ref={containerRef} className="absolute inset-0" aria-hidden />
       {!isResumeActive && (
         <motion.div
@@ -92,16 +98,33 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
           <SharedName layoutId="hero-name" isResume={false} lang={lang} />
           <motion.p
             layout
-            className="mt-4 text-center text-sm font-medium tracking-widest text-zinc-500 dark:text-zinc-400 md:text-base whitespace-nowrap"
+            className="mt-3 text-center text-sm font-medium tracking-widest text-zinc-500 dark:text-zinc-400 md:text-base whitespace-nowrap"
             initial={{ opacity: 0.8 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.2 }}
           >
-            {t(
+            {(lang === "zh" ? hero?.subtitleZh : hero?.subtitle) || t(
               "Embedded Systems Engineer",
               "嵌入式系统工程师 / Embedded Systems Engineer"
             )}
           </motion.p>
+          {hasContact && (
+            <motion.div
+              layout
+              className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-zinc-500 dark:text-zinc-400"
+              style={{
+                fontSize: `${fontSize}px`,
+                transform: `translate(${posX}px, ${posY}px)`,
+              }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              {hero?.phone && <span>{hero.phone}</span>}
+              {hero?.email && <span>{hero.email}</span>}
+              {hero?.address && <span>{hero.address}</span>}
+            </motion.div>
+          )}
         </motion.div>
       )}
     </section>
@@ -169,7 +192,7 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
           </div>
           <div className="mt-12 space-y-8 border-t border-[hsl(var(--border))] pt-8">
             {hasCmsResume && cmsResume ? (
-              <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:mt-6 prose-headings:mb-2 text-[hsl(var(--text-muted))]">
+              <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:mt-6 prose-headings:mb-2">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {(lang === "zh" ? cmsResume.contentZh : cmsResume.contentEn) || (lang === "zh" ? cmsResume.contentEn : cmsResume.contentZh) || ""}
                 </ReactMarkdown>
