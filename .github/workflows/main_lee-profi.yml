@@ -1,5 +1,4 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-# More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy Node.js app to Azure Web App - lee-profi
 
@@ -30,18 +29,20 @@ jobs:
       - name: Build project
         run: npm run build
 
-      # 💡 核心修改 1：将必须的静态资源复制到 standalone 文件夹中
-      - name: Copy static files to standalone
+      # 💡 核心修改 1：复制静态资源，并强行手动打包（确保包含 .next 隐藏文件夹）
+      - name: Prepare and Zip standalone
         run: |
           cp -r public .next/standalone/ || true
           cp -r .next/static .next/standalone/.next/
+          cd .next/standalone
+          zip -r ../../deploy.zip . 
 
-      # 💡 核心修改 2：只打包并上传精简版文件夹，彻底抛弃外部庞大的 node_modules
+      # 💡 核心修改 2：只上传这一个绝对完整的压缩包 deploy.zip
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .next/standalone # 以前这里是 "."
+          path: deploy.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -53,11 +54,12 @@ jobs:
         with:
           name: node-app
       
+      # 💡 核心修改 3：直接把 deploy.zip 喂给 Azure，配合 WEBSITE_RUN_FROM_PACKAGE=1 瞬间挂载
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'lee-profi'
           slot-name: 'Production'
-          package: . # 这里保持 "." 不变，因为下载下来的 artifact 本身就已经是精简版了
+          package: deploy.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_76EC72A0F0DA4330A3588E662B6593CB }}
