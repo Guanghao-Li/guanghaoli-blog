@@ -22,7 +22,8 @@ const HeroSchema = new mongoose.Schema(
     maxAngle: { type: Number, default: 135 },
     minVelocity: { type: Number, default: 5 },
     maxVelocity: { type: Number, default: 12 },
-    gravity: { type: Number, default: 1 },
+    gravity: { type: Number, default: 0.05 },
+    friction: { type: Number, default: 0.96 },
   },
   { _id: true, timestamps: false }
 );
@@ -56,6 +57,7 @@ export async function upsertHero(data: {
   minVelocity?: number;
   maxVelocity?: number;
   gravity?: number;
+  friction?: number;
 }) {
   await connectDB();
   const doc = await Hero.findOneAndUpdate(

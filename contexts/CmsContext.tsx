@@ -31,6 +31,7 @@ interface HeroData {
   minVelocity?: number;
   maxVelocity?: number;
   gravity?: number;
+  friction?: number;
 }
 
 export interface DashboardWidget {

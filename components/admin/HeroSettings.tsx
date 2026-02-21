@@ -23,7 +23,8 @@ export default function HeroSettings() {
   const [maxAngle, setMaxAngle] = useState(135);
   const [minVelocity, setMinVelocity] = useState(5);
   const [maxVelocity, setMaxVelocity] = useState(12);
-  const [gravity, setGravity] = useState(1);
+  const [gravity, setGravity] = useState(0.05);
+  const [friction, setFriction] = useState(0.96);
   const [infoPositionX, setInfoPositionX] = useState(0);
   const [infoPositionY, setInfoPositionY] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -54,7 +55,8 @@ export default function HeroSettings() {
         setMaxAngle(h.maxAngle ?? 135);
         setMinVelocity(h.minVelocity ?? 5);
         setMaxVelocity(h.maxVelocity ?? 12);
-        setGravity(h.gravity ?? 1);
+        setGravity(h.gravity ?? 0.05);
+        setFriction(h.friction ?? 0.96);
         setInfoPositionX(h.infoPositionX ?? 0);
         setInfoPositionY(h.infoPositionY ?? 0);
         setDirty(false);
@@ -88,6 +90,7 @@ export default function HeroSettings() {
         minVelocity,
         maxVelocity,
         gravity,
+        friction,
       };
       await fetch("/api/admin/cms", {
         method: "PUT",
@@ -300,14 +303,26 @@ export default function HeroSettings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">重力 (px/帧²) {gravity}</label>
+            <label className="block text-sm font-medium mb-1">重力 (气球低重力) {gravity}</label>
             <input
               type="range"
-              min={0.5}
-              max={2}
-              step={0.1}
+              min={0.02}
+              max={0.08}
+              step={0.01}
               value={gravity}
               onChange={(e) => { setGravity(Number(e.target.value)); setDirty(true); }}
+              className="w-full h-2 rounded-lg accent-zinc-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">空气阻力 (Friction) {friction}</label>
+            <input
+              type="range"
+              min={0.92}
+              max={0.99}
+              step={0.01}
+              value={friction}
+              onChange={(e) => { setFriction(Number(e.target.value)); setDirty(true); }}
               className="w-full h-2 rounded-lg accent-zinc-700"
             />
           </div>

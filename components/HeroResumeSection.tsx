@@ -62,14 +62,16 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const maxAngle = hero?.maxAngle ?? 135;
   const minVelocity = hero?.minVelocity ?? 5;
   const maxVelocity = hero?.maxVelocity ?? 12;
-  const gravity = hero?.gravity ?? 1;
+  const gravity = hero?.gravity ?? 0.05;
+  const friction = hero?.friction ?? 0.96;
   const { particles, spawn, remove } = usePhysicsEmojis(
     emojiSize,
     minAngle,
     maxAngle,
     minVelocity,
     maxVelocity,
-    gravity
+    gravity,
+    friction
   );
 
   useEffect(() => {
@@ -97,7 +99,7 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
 
   return (
     <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-20 md:-translate-y-24">
-      <PhysicsEmoji particles={particles} onRemove={remove} emojiSize={emojiSize} gravity={gravity} />
+      <PhysicsEmoji particles={particles} onRemove={remove} emojiSize={emojiSize} gravity={gravity} friction={friction} />
       <div ref={containerRef} className="absolute inset-0" aria-hidden />
       {!isResumeActive && (
         <motion.div

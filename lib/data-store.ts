@@ -24,6 +24,7 @@ export interface CmsData {
     minVelocity?: number;
     maxVelocity?: number;
     gravity?: number;
+    friction?: number;
   };
   resume: ResumeData;
   projects: Array<{
@@ -94,7 +95,8 @@ export const DEFAULT_DATA: CmsData = {
     maxAngle: 135,
     minVelocity: 5,
     maxVelocity: 12,
-    gravity: 1,
+    gravity: 0.05,
+    friction: 0.96,
   },
   resume: {
     nameEn: "Guanghao Li",

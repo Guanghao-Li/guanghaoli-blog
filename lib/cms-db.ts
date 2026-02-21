@@ -27,7 +27,8 @@ function toHeroPayload(hero: CmsData["hero"]) {
     maxAngle: hero?.maxAngle ?? 135,
     minVelocity: hero?.minVelocity ?? 5,
     maxVelocity: hero?.maxVelocity ?? 12,
-    gravity: hero?.gravity ?? 1,
+    gravity: hero?.gravity ?? 0.05,
+    friction: hero?.friction ?? 0.96,
   };
 }
 
@@ -120,7 +121,8 @@ export async function loadCmsData(): Promise<CmsData> {
         maxAngle: heroDoc.maxAngle ?? 135,
         minVelocity: heroDoc.minVelocity ?? 5,
         maxVelocity: heroDoc.maxVelocity ?? 12,
-        gravity: heroDoc.gravity ?? 1,
+        gravity: heroDoc.gravity ?? 0.05,
+        friction: heroDoc.friction ?? 0.96,
       }
     : DEFAULT_DATA.hero;
 

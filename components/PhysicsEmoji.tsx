@@ -2,15 +2,33 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-const EMOJIS = ["⚡️", "💡", "🚀", "💻", "🎯", "✨", "🔥", "🌟"];
+const TWEMOJI_CDN = "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg";
+const TWEMOJI_CODEPOINTS = [
+  "1f602", // 😂 笑哭
+  "1f60e", // 😎 墨镜
+  "1f4b0", // 💰 发财
+  "1f970", // 🥰 比心/爱心眼
+  "1f525", // 🔥 火焰
+  "1f4a1", // 💡 灯泡
+  "1f680", // 🚀 火箭
+  "1f389", // 🎉 庆祝
+  "1f31f", // 🌟 星星
+  "1f4aa", // 💪 强壮
+  "1f44d", // 👍 点赞
+  "1f60d", // 😍 花痴
+];
+
+const TWEMOJI_URLS = TWEMOJI_CODEPOINTS.map((cp) => `${TWEMOJI_CDN}/${cp}.svg`);
 
 export interface EmojiParticle {
   id: string;
-  emoji: string;
+  imgUrl: string;
   x: number;
   y: number;
   vx: number;
   vy: number;
+  phase: number;
+  driftAmplitude: number;
 }
 
 function rad(deg: number) {
@@ -20,13 +38,15 @@ function rad(deg: number) {
 export default function PhysicsEmoji({
   particles,
   onRemove,
-  emojiSize = 28,
+  emojiSize = 36,
   gravity,
+  friction,
 }: {
   particles: EmojiParticle[];
   onRemove: (id: string) => void;
   emojiSize?: number;
   gravity: number;
+  friction: number;
 }) {
   const stateRef = useRef<Map<string, EmojiParticle>>(new Map());
   const [positions, setPositions] = useState<Map<string, { x: number; y: number }>>(new Map());
@@ -42,10 +62,14 @@ export default function PhysicsEmoji({
       const next = new Map<string, { x: number; y: number }>();
       const toRemove: string[] = [];
       const viewH = window.innerHeight;
+      const t = Date.now() / 300;
 
       stateRef.current.forEach((p, id) => {
+        p.vx *= friction;
+        p.vy *= friction;
         p.vy += gravity;
-        p.x += p.vx;
+        const drift = Math.sin(t + p.phase) * p.driftAmplitude;
+        p.x += p.vx + drift;
         p.y += p.vy;
         next.set(id, { x: p.x, y: p.y });
         if (p.y > viewH + 80) toRemove.push(id);
@@ -66,25 +90,31 @@ export default function PhysicsEmoji({
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [particles.length, gravity, onRemove]);
+  }, [particles.length, gravity, friction, onRemove]);
 
   return (
     <>
       {particles.map((p) => {
         const pos = positions.get(p.id) ?? { x: p.x, y: p.y };
         return (
-          <span
+          <div
             key={p.id}
             className="fixed pointer-events-none z-[60] select-none"
             style={{
               left: pos.x,
               top: pos.y,
-              fontSize: `${emojiSize}px`,
+              width: emojiSize,
+              height: emojiSize,
               transform: "translate(-50%, -50%)",
             }}
           >
-            {p.emoji}
-          </span>
+            <img
+              src={p.imgUrl}
+              alt=""
+              draggable={false}
+              className="w-full h-full object-contain"
+            />
+          </div>
         );
       })}
     </>
@@ -97,7 +127,8 @@ export function usePhysicsEmojis(
   maxAngle: number,
   minVelocity: number,
   maxVelocity: number,
-  gravity: number
+  gravity: number,
+  friction: number
 ) {
   const [particles, setParticles] = useState<EmojiParticle[]>([]);
 
@@ -108,7 +139,7 @@ export function usePhysicsEmojis(
 
       for (let i = 0; i < count; i++) {
         const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        const imgUrl = TWEMOJI_URLS[Math.floor(Math.random() * TWEMOJI_URLS.length)];
 
         const aLo = Math.min(minAngle, maxAngle);
         const aHi = Math.max(minAngle, maxAngle);
@@ -128,11 +159,13 @@ export function usePhysicsEmojis(
 
         newParticles.push({
           id,
-          emoji,
+          imgUrl,
           x: startX,
           y: startY,
           vx,
           vy,
+          phase: Math.random() * Math.PI * 2,
+          driftAmplitude: 0.3 + Math.random() * 0.7,
         });
       }
 
