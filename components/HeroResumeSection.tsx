@@ -58,14 +58,18 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const { lang, t } = useLanguage();
   const hero = useCmsHero();
   const emojiSize = hero?.emojiSize ?? 28;
-  const gravity = hero?.gravity ?? 1000;
-  const animationSpeed = hero?.animationSpeed ?? 2;
+  const minAngle = hero?.minAngle ?? 45;
+  const maxAngle = hero?.maxAngle ?? 135;
+  const minVelocity = hero?.minVelocity ?? 5;
+  const maxVelocity = hero?.maxVelocity ?? 12;
+  const gravity = hero?.gravity ?? 1;
   const { particles, spawn, remove } = usePhysicsEmojis(
     emojiSize,
-    45,
-    135,
-    gravity,
-    animationSpeed
+    minAngle,
+    maxAngle,
+    minVelocity,
+    maxVelocity,
+    gravity
   );
 
   useEffect(() => {
@@ -93,7 +97,7 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
 
   return (
     <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-20 md:-translate-y-24">
-      <PhysicsEmoji particles={particles} onRemove={remove} emojiSize={emojiSize} />
+      <PhysicsEmoji particles={particles} onRemove={remove} emojiSize={emojiSize} gravity={gravity} />
       <div ref={containerRef} className="absolute inset-0" aria-hidden />
       {!isResumeActive && (
         <motion.div
@@ -108,7 +112,7 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
               className="absolute inset-0 -m-4 rounded-full bg-slate-300/60 dark:bg-zinc-700/60"
               aria-hidden
             />
-            <SharedAvatar layoutId="hero-avatar" isResume={false} onAvatarClick={spawn} />
+            <SharedAvatar layoutId="hero-avatar" isResume={false} onAvatarClick={(cx, cy, r) => spawn(cx, cy, r)} />
           </div>
           <SharedName layoutId="hero-name" isResume={false} lang={lang} />
           <motion.p
@@ -332,7 +336,7 @@ function SharedAvatar({
 }: {
   layoutId: string;
   isResume: boolean;
-  onAvatarClick?: (x: number, y: number) => void;
+  onAvatarClick?: (centerX: number, centerY: number, radius: number) => void;
 }) {
   const hero = useCmsHero();
   const avatarSrc = hero?.avatar || AVATAR_SRC;
@@ -359,7 +363,13 @@ function SharedAvatar({
         }
         onClick={
           !isResume && onAvatarClick
-            ? (e) => onAvatarClick(e.clientX, e.clientY)
+            ? (e) => {
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                const radius = Math.min(rect.width, rect.height) / 2;
+                onAvatarClick(centerX, centerY, radius);
+              }
             : undefined
         }
       >

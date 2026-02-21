@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ImageCropper from "./ImageCropper";
+import CircularAngleRangePicker from "./CircularAngleRangePicker";
 import { useUnsavedPrompt } from "@/hooks/useUnsavedPrompt";
 
 export default function HeroSettings() {
@@ -20,8 +21,9 @@ export default function HeroSettings() {
   const [emojiSize, setEmojiSize] = useState(28);
   const [minAngle, setMinAngle] = useState(45);
   const [maxAngle, setMaxAngle] = useState(135);
-  const [gravity, setGravity] = useState(1000);
-  const [animationSpeed, setAnimationSpeed] = useState(2);
+  const [minVelocity, setMinVelocity] = useState(5);
+  const [maxVelocity, setMaxVelocity] = useState(12);
+  const [gravity, setGravity] = useState(1);
   const [infoPositionX, setInfoPositionX] = useState(0);
   const [infoPositionY, setInfoPositionY] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -50,8 +52,9 @@ export default function HeroSettings() {
         setEmojiSize(h.emojiSize ?? 28);
         setMinAngle(h.minAngle ?? 45);
         setMaxAngle(h.maxAngle ?? 135);
-        setGravity(h.gravity ?? 1000);
-        setAnimationSpeed(h.animationSpeed ?? 2);
+        setMinVelocity(h.minVelocity ?? 5);
+        setMaxVelocity(h.maxVelocity ?? 12);
+        setGravity(h.gravity ?? 1);
         setInfoPositionX(h.infoPositionX ?? 0);
         setInfoPositionY(h.infoPositionY ?? 0);
         setDirty(false);
@@ -82,8 +85,9 @@ export default function HeroSettings() {
         emojiSize,
         minAngle,
         maxAngle,
+        minVelocity,
+        maxVelocity,
         gravity,
-        animationSpeed,
       };
       await fetch("/api/admin/cms", {
         method: "PUT",
@@ -247,7 +251,7 @@ export default function HeroSettings() {
         </div>
       </div>
       <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mt-4">
-        <h3 className="text-sm font-semibold mb-3">头像 Emoji 弹射</h3>
+        <h3 className="text-sm font-semibold mb-3">头像 Emoji 弹射 (极客控制)</h3>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-1">Emoji 字号 (px) {emojiSize}</label>
@@ -262,50 +266,48 @@ export default function HeroSettings() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">发射角度 min (°) {minAngle}</label>
+            <label className="block text-sm font-medium mb-2">发射角度范围 (0°=右, 90°=上)</label>
+            <CircularAngleRangePicker
+              minAngle={minAngle}
+              maxAngle={maxAngle}
+              onMinChange={(v) => { setMinAngle(v); setDirty(true); }}
+              onMaxChange={(v) => { setMaxAngle(v); setDirty(true); }}
+              size={140}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">初速度 min (px/帧) {minVelocity}</label>
             <input
               type="range"
-              min={0}
-              max={90}
-              step={5}
-              value={minAngle}
-              onChange={(e) => { setMinAngle(Number(e.target.value)); setDirty(true); }}
+              min={2}
+              max={20}
+              step={1}
+              value={minVelocity}
+              onChange={(e) => { setMinVelocity(Number(e.target.value)); setDirty(true); }}
               className="w-full h-2 rounded-lg accent-zinc-700"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">发射角度 max (°) {maxAngle}</label>
+            <label className="block text-sm font-medium mb-1">初速度 max (px/帧) {maxVelocity}</label>
             <input
               type="range"
-              min={90}
-              max={180}
-              step={5}
-              value={maxAngle}
-              onChange={(e) => { setMaxAngle(Number(e.target.value)); setDirty(true); }}
+              min={2}
+              max={20}
+              step={1}
+              value={maxVelocity}
+              onChange={(e) => { setMaxVelocity(Number(e.target.value)); setDirty(true); }}
               className="w-full h-2 rounded-lg accent-zinc-700"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">重力/下落深度 (px) {gravity}</label>
+            <label className="block text-sm font-medium mb-1">重力 (px/帧²) {gravity}</label>
             <input
               type="range"
-              min={800}
-              max={1500}
-              step={50}
+              min={0.5}
+              max={2}
+              step={0.1}
               value={gravity}
               onChange={(e) => { setGravity(Number(e.target.value)); setDirty(true); }}
-              className="w-full h-2 rounded-lg accent-zinc-700"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">动画时长 (s) {animationSpeed}</label>
-            <input
-              type="range"
-              min={1.5}
-              max={3}
-              step={0.1}
-              value={animationSpeed}
-              onChange={(e) => { setAnimationSpeed(Number(e.target.value)); setDirty(true); }}
               className="w-full h-2 rounded-lg accent-zinc-700"
             />
           </div>

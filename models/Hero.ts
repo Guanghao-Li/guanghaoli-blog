@@ -20,8 +20,9 @@ const HeroSchema = new mongoose.Schema(
     emojiSize: { type: Number, default: 28 },
     minAngle: { type: Number, default: 45 },
     maxAngle: { type: Number, default: 135 },
-    gravity: { type: Number, default: 1000 },
-    animationSpeed: { type: Number, default: 2 },
+    minVelocity: { type: Number, default: 5 },
+    maxVelocity: { type: Number, default: 12 },
+    gravity: { type: Number, default: 1 },
   },
   { _id: true, timestamps: false }
 );
@@ -52,8 +53,9 @@ export async function upsertHero(data: {
   emojiSize?: number;
   minAngle?: number;
   maxAngle?: number;
+  minVelocity?: number;
+  maxVelocity?: number;
   gravity?: number;
-  animationSpeed?: number;
 }) {
   await connectDB();
   const doc = await Hero.findOneAndUpdate(

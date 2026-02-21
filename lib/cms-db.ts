@@ -25,8 +25,9 @@ function toHeroPayload(hero: CmsData["hero"]) {
     emojiSize: hero?.emojiSize ?? 28,
     minAngle: hero?.minAngle ?? 45,
     maxAngle: hero?.maxAngle ?? 135,
-    gravity: hero?.gravity ?? 1000,
-    animationSpeed: hero?.animationSpeed ?? 2,
+    minVelocity: hero?.minVelocity ?? 5,
+    maxVelocity: hero?.maxVelocity ?? 12,
+    gravity: hero?.gravity ?? 1,
   };
 }
 
@@ -117,8 +118,9 @@ export async function loadCmsData(): Promise<CmsData> {
         emojiSize: heroDoc.emojiSize ?? 28,
         minAngle: heroDoc.minAngle ?? 45,
         maxAngle: heroDoc.maxAngle ?? 135,
-        gravity: heroDoc.gravity ?? 1000,
-        animationSpeed: heroDoc.animationSpeed ?? 2,
+        minVelocity: heroDoc.minVelocity ?? 5,
+        maxVelocity: heroDoc.maxVelocity ?? 12,
+        gravity: heroDoc.gravity ?? 1,
       }
     : DEFAULT_DATA.hero;
 

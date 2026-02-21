@@ -21,8 +21,9 @@ export interface CmsData {
     emojiSize?: number;
     minAngle?: number;
     maxAngle?: number;
+    minVelocity?: number;
+    maxVelocity?: number;
     gravity?: number;
-    animationSpeed?: number;
   };
   resume: ResumeData;
   projects: Array<{
@@ -91,8 +92,9 @@ export const DEFAULT_DATA: CmsData = {
     emojiSize: 28,
     minAngle: 45,
     maxAngle: 135,
-    gravity: 1000,
-    animationSpeed: 2,
+    minVelocity: 5,
+    maxVelocity: 12,
+    gravity: 1,
   },
   resume: {
     nameEn: "Guanghao Li",
