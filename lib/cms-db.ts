@@ -13,12 +13,18 @@ function toHeroPayload(hero: CmsData["hero"]) {
     subtitle: hero?.subtitle ?? DEFAULT_DATA.hero.subtitle,
     subtitleZh: hero?.subtitleZh ?? DEFAULT_DATA.hero.subtitleZh,
     ...(hero?.avatar !== undefined && { avatar: hero.avatar }),
-    phone: hero?.phone ?? "",
-    email: hero?.email ?? "",
-    address: hero?.address ?? "",
+    phoneEn: hero?.phoneEn ?? "",
+    phoneZh: hero?.phoneZh ?? "",
+    emailEn: hero?.emailEn ?? "",
+    emailZh: hero?.emailZh ?? "",
+    addressEn: hero?.addressEn ?? "",
+    addressZh: hero?.addressZh ?? "",
     infoFontSize: hero?.infoFontSize ?? 14,
     infoPositionX: hero?.infoPositionX ?? 0,
     infoPositionY: hero?.infoPositionY ?? 0,
+    emojiSize: hero?.emojiSize ?? 28,
+    minAngle: hero?.minAngle ?? 45,
+    maxAngle: hero?.maxAngle ?? 135,
   };
 }
 
@@ -29,6 +35,9 @@ function toResumePayload(resume: CmsData["resume"]) {
     contentEn: resume?.contentEn ?? DEFAULT_DATA.resume.contentEn,
     contentZh: resume?.contentZh ?? DEFAULT_DATA.resume.contentZh,
     paperStyle: resume?.paperStyle ?? DEFAULT_DATA.resume.paperStyle,
+    infoFontSize: resume?.infoFontSize ?? 14,
+    infoPositionX: resume?.infoPositionX ?? 0,
+    infoPositionY: resume?.infoPositionY ?? 0,
   };
 }
 
@@ -94,12 +103,18 @@ export async function loadCmsData(): Promise<CmsData> {
         subtitle: heroDoc.subtitle ?? DEFAULT_DATA.hero.subtitle,
         subtitleZh: heroDoc.subtitleZh ?? DEFAULT_DATA.hero.subtitleZh,
         ...(heroDoc.avatar && { avatar: heroDoc.avatar }),
-        phone: heroDoc.phone ?? "",
-        email: heroDoc.email ?? "",
-        address: heroDoc.address ?? "",
+        phoneEn: heroDoc.phoneEn ?? heroDoc.phone ?? "",
+        phoneZh: heroDoc.phoneZh ?? heroDoc.phone ?? "",
+        emailEn: heroDoc.emailEn ?? heroDoc.email ?? "",
+        emailZh: heroDoc.emailZh ?? heroDoc.email ?? "",
+        addressEn: heroDoc.addressEn ?? heroDoc.address ?? "",
+        addressZh: heroDoc.addressZh ?? heroDoc.address ?? "",
         infoFontSize: heroDoc.infoFontSize ?? 14,
         infoPositionX: heroDoc.infoPositionX ?? 0,
         infoPositionY: heroDoc.infoPositionY ?? 0,
+        emojiSize: heroDoc.emojiSize ?? 28,
+        minAngle: heroDoc.minAngle ?? 45,
+        maxAngle: heroDoc.maxAngle ?? 135,
       }
     : DEFAULT_DATA.hero;
 
@@ -110,6 +125,9 @@ export async function loadCmsData(): Promise<CmsData> {
         contentEn: resumeDoc.contentEn ?? DEFAULT_DATA.resume.contentEn,
         contentZh: resumeDoc.contentZh ?? DEFAULT_DATA.resume.contentZh,
         paperStyle: resumeDoc.paperStyle ?? DEFAULT_DATA.resume.paperStyle,
+        infoFontSize: resumeDoc.infoFontSize ?? 14,
+        infoPositionX: resumeDoc.infoPositionX ?? 0,
+        infoPositionY: resumeDoc.infoPositionY ?? 0,
       }
     : DEFAULT_DATA.resume;
 

@@ -10,10 +10,16 @@ export default function HeroSettings() {
   const [subtitle, setSubtitle] = useState("");
   const [subtitleZh, setSubtitleZh] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
+  const [phoneEn, setPhoneEn] = useState("");
+  const [phoneZh, setPhoneZh] = useState("");
+  const [emailEn, setEmailEn] = useState("");
+  const [emailZh, setEmailZh] = useState("");
+  const [addressEn, setAddressEn] = useState("");
+  const [addressZh, setAddressZh] = useState("");
   const [infoFontSize, setInfoFontSize] = useState(14);
+  const [emojiSize, setEmojiSize] = useState(28);
+  const [minAngle, setMinAngle] = useState(45);
+  const [maxAngle, setMaxAngle] = useState(135);
   const [infoPositionX, setInfoPositionX] = useState(0);
   const [infoPositionY, setInfoPositionY] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -32,10 +38,16 @@ export default function HeroSettings() {
         setSubtitle(h.subtitle ?? "");
         setSubtitleZh(h.subtitleZh ?? "");
         setAvatar(h.avatar ?? "");
-        setPhone(h.phone ?? "");
-        setEmail(h.email ?? "");
-        setAddress(h.address ?? "");
+        setPhoneEn(h.phoneEn ?? h.phone ?? "");
+        setPhoneZh(h.phoneZh ?? h.phone ?? "");
+        setEmailEn(h.emailEn ?? h.email ?? "");
+        setEmailZh(h.emailZh ?? h.email ?? "");
+        setAddressEn(h.addressEn ?? h.address ?? "");
+        setAddressZh(h.addressZh ?? h.address ?? "");
         setInfoFontSize(h.infoFontSize ?? 14);
+        setEmojiSize(h.emojiSize ?? 28);
+        setMinAngle(h.minAngle ?? 45);
+        setMaxAngle(h.maxAngle ?? 135);
         setInfoPositionX(h.infoPositionX ?? 0);
         setInfoPositionY(h.infoPositionY ?? 0);
         setDirty(false);
@@ -54,12 +66,18 @@ export default function HeroSettings() {
         subtitle,
         subtitleZh,
         avatar: avatar || undefined,
-        phone,
-        email,
-        address,
+        phoneEn,
+        phoneZh,
+        emailEn,
+        emailZh,
+        addressEn,
+        addressZh,
         infoFontSize,
         infoPositionX,
         infoPositionY,
+        emojiSize,
+        minAngle,
+        maxAngle,
       };
       await fetch("/api/admin/cms", {
         method: "PUT",
@@ -121,33 +139,61 @@ export default function HeroSettings() {
         />
       </div>
       <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mt-4">
-        <h3 className="text-sm font-semibold mb-3">联系方式</h3>
-        <div className="space-y-3">
+        <h3 className="text-sm font-semibold mb-3">联系方式 (双语)</h3>
+        <div className="space-y-3 grid sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium">电话</label>
+            <label className="block text-sm font-medium">电话 (英文)</label>
             <input
-              value={phone}
-              onChange={(e) => { setPhone(e.target.value); setDirty(true); }}
+              value={phoneEn}
+              onChange={(e) => { setPhoneEn(e.target.value); setDirty(true); }}
               placeholder="+1 201 555 0123"
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">邮箱</label>
+            <label className="block text-sm font-medium">电话 (中文)</label>
+            <input
+              value={phoneZh}
+              onChange={(e) => { setPhoneZh(e.target.value); setDirty(true); }}
+              placeholder="+86 138 0000 0000"
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">邮箱 (英文)</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setDirty(true); }}
+              value={emailEn}
+              onChange={(e) => { setEmailEn(e.target.value); setDirty(true); }}
               placeholder="you@example.com"
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">地址</label>
+            <label className="block text-sm font-medium">邮箱 (中文)</label>
             <input
-              value={address}
-              onChange={(e) => { setAddress(e.target.value); setDirty(true); }}
+              type="email"
+              value={emailZh}
+              onChange={(e) => { setEmailZh(e.target.value); setDirty(true); }}
+              placeholder="同上或不同"
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">地址 (英文)</label>
+            <input
+              value={addressEn}
+              onChange={(e) => { setAddressEn(e.target.value); setDirty(true); }}
               placeholder="Hoboken, New Jersey"
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium">地址 (中文)</label>
+            <input
+              value={addressZh}
+              onChange={(e) => { setAddressZh(e.target.value); setDirty(true); }}
+              placeholder="新泽西州霍博肯"
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800"
             />
           </div>
@@ -189,6 +235,47 @@ export default function HeroSettings() {
               step={1}
               value={infoPositionY}
               onChange={(e) => { setInfoPositionY(Number(e.target.value)); setDirty(true); }}
+              className="w-full h-2 rounded-lg accent-zinc-700"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="border-t border-zinc-200 dark:border-zinc-700 pt-4 mt-4">
+        <h3 className="text-sm font-semibold mb-3">头像 Emoji 弹射</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Emoji 字号 (px) {emojiSize}</label>
+            <input
+              type="range"
+              min={16}
+              max={48}
+              step={2}
+              value={emojiSize}
+              onChange={(e) => { setEmojiSize(Number(e.target.value)); setDirty(true); }}
+              className="w-full h-2 rounded-lg accent-zinc-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">发射角度 min (°) {minAngle}</label>
+            <input
+              type="range"
+              min={0}
+              max={90}
+              step={5}
+              value={minAngle}
+              onChange={(e) => { setMinAngle(Number(e.target.value)); setDirty(true); }}
+              className="w-full h-2 rounded-lg accent-zinc-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">发射角度 max (°) {maxAngle}</label>
+            <input
+              type="range"
+              min={90}
+              max={180}
+              step={5}
+              value={maxAngle}
+              onChange={(e) => { setMaxAngle(Number(e.target.value)); setDirty(true); }}
               className="w-full h-2 rounded-lg accent-zinc-700"
             />
           </div>

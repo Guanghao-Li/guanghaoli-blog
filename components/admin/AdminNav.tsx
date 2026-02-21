@@ -7,7 +7,7 @@ import { User, FileText, FolderOpen, Settings, Cpu, LayoutGrid, Menu, X } from "
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/admin", label: "极客仪表盘", icon: User },
+  { href: "/admin", label: "首页", icon: User },
   { href: "/admin/resume", label: "简历管理", icon: FileText },
   { href: "/admin/projects", label: "项目展示", icon: FolderOpen },
   { href: "/admin/dashboard", label: "仪表盘组件", icon: LayoutGrid },
@@ -20,11 +20,14 @@ export default function AdminNav() {
 
   return (
     <>
-      {/* 移动端汉堡按钮 */}
+      {/* 移动端汉堡按钮 - 侧栏展开时隐藏 */}
       <button
         type="button"
         onClick={() => setDrawerOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-300 bg-white shadow dark:border-zinc-600 dark:bg-zinc-800"
+        className={cn(
+          "md:hidden fixed top-4 left-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-300 bg-white shadow dark:border-zinc-600 dark:bg-zinc-800 transition-opacity duration-200",
+          drawerOpen && "opacity-0 pointer-events-none"
+        )}
         aria-label="打开菜单"
       >
         <Menu className="h-5 w-5" />

@@ -27,6 +27,12 @@ export default function ResumeManager() {
     setData((prev: any) => (prev ? { ...prev, resume: next } : prev));
   };
 
+  const updateHero = (updates: Record<string, any>) => {
+    setData((prev: any) =>
+      prev ? { ...prev, hero: { ...(prev.hero ?? {}), ...updates } } : prev
+    );
+  };
+
   const save = async () => {
     if (!data || !resume) return;
     setSaving(true);
@@ -47,11 +53,15 @@ export default function ResumeManager() {
 
   const r = resume ?? getDefaultResume();
   const paper = r.paperStyle ?? DEFAULT_DATA.resume.paperStyle ?? {};
+  const h = data.hero ?? {};
+  const rInfoFont = r.infoFontSize ?? 14;
+  const rInfoX = r.infoPositionX ?? 0;
+  const rInfoY = r.infoPositionY ?? 0;
 
   return (
     <div className="mt-6 max-w-4xl space-y-8">
       <section>
-        <h2 className="text-lg font-medium">姓名 (Name)</h2>
+        <h2 className="text-lg font-medium">姓名</h2>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           <div>
             <label className="block text-xs text-zinc-500">英文</label>
@@ -73,7 +83,37 @@ export default function ResumeManager() {
       </section>
 
       <section>
-        <h2 className="text-lg font-medium">纸张样式 (Paper Style)</h2>
+        <h2 className="text-lg font-medium">联系方式（与首页共享）</h2>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          <div><label className="block text-xs text-zinc-500">电话 (EN)</label><input value={h.phoneEn ?? ""} onChange={(e) => updateHero({ phoneEn: e.target.value })} placeholder="+1 201 555 0123" className="mt-0.5 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800" /></div>
+          <div><label className="block text-xs text-zinc-500">电话 (ZH)</label><input value={h.phoneZh ?? ""} onChange={(e) => updateHero({ phoneZh: e.target.value })} placeholder="+86 138 0000 0000" className="mt-0.5 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800" /></div>
+          <div><label className="block text-xs text-zinc-500">邮箱 (EN)</label><input type="email" value={h.emailEn ?? ""} onChange={(e) => updateHero({ emailEn: e.target.value })} placeholder="you@example.com" className="mt-0.5 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800" /></div>
+          <div><label className="block text-xs text-zinc-500">邮箱 (ZH)</label><input type="email" value={h.emailZh ?? ""} onChange={(e) => updateHero({ emailZh: e.target.value })} className="mt-0.5 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800" /></div>
+          <div><label className="block text-xs text-zinc-500">地址 (EN)</label><input value={h.addressEn ?? ""} onChange={(e) => updateHero({ addressEn: e.target.value })} placeholder="Hoboken, New Jersey" className="mt-0.5 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800" /></div>
+          <div><label className="block text-xs text-zinc-500">地址 (ZH)</label><input value={h.addressZh ?? ""} onChange={(e) => updateHero({ addressZh: e.target.value })} placeholder="新泽西州霍博肯" className="mt-0.5 w-full rounded-lg border border-zinc-300 px-3 py-2 dark:border-zinc-600 dark:bg-zinc-800" /></div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-lg font-medium">简历页信息区排版</h2>
+        <div className="mt-2 space-y-4">
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">字号 (px) {rInfoFont}</label>
+            <input type="range" min={10} max={24} step={1} value={rInfoFont} onChange={(e) => updateResume({ infoFontSize: Number(e.target.value) })} className="w-full h-2 rounded-lg accent-zinc-700" />
+          </div>
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">X 轴偏移 {rInfoX}</label>
+            <input type="range" min={-50} max={50} step={1} value={rInfoX} onChange={(e) => updateResume({ infoPositionX: Number(e.target.value) })} className="w-full h-2 rounded-lg accent-zinc-700" />
+          </div>
+          <div>
+            <label className="block text-xs text-zinc-500 mb-1">Y 轴偏移 {rInfoY}</label>
+            <input type="range" min={-30} max={30} step={1} value={rInfoY} onChange={(e) => updateResume({ infoPositionY: Number(e.target.value) })} className="w-full h-2 rounded-lg accent-zinc-700" />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-lg font-medium">纸张样式</h2>
         <div className="mt-2 grid gap-4 sm:grid-cols-3">
           <div>
             <label className="block text-xs text-zinc-500">maxWidth</label>
@@ -163,6 +203,9 @@ function normalizeResume(r: any): ResumeData | null {
     contentEn: r.contentEn ?? "",
     contentZh: r.contentZh ?? "",
     paperStyle: r.paperStyle ?? DEFAULT_DATA.resume.paperStyle,
+    infoFontSize: r.infoFontSize ?? 14,
+    infoPositionX: r.infoPositionX ?? 0,
+    infoPositionY: r.infoPositionY ?? 0,
   };
 }
 
@@ -173,5 +216,8 @@ function getDefaultResume(): ResumeData {
     contentEn: DEFAULT_DATA.resume.contentEn,
     contentZh: DEFAULT_DATA.resume.contentZh,
     paperStyle: DEFAULT_DATA.resume.paperStyle,
+    infoFontSize: 14,
+    infoPositionX: 0,
+    infoPositionY: 0,
   };
 }

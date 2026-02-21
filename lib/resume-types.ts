@@ -13,6 +13,9 @@ export interface ResumeData {
   contentEn: string;
   contentZh: string;
   paperStyle?: ResumePaperStyle;
+  infoFontSize?: number;
+  infoPositionX?: number;
+  infoPositionY?: number;
   /** @deprecated 兼容旧结构，优先使用 contentEn/contentZh */
   basicInfo?: any[];
   sections?: any[];

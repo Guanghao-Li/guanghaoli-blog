@@ -16,12 +16,18 @@ interface HeroData {
   subtitle?: string;
   subtitleZh?: string;
   avatar?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
+  phoneEn?: string;
+  phoneZh?: string;
+  emailEn?: string;
+  emailZh?: string;
+  addressEn?: string;
+  addressZh?: string;
   infoFontSize?: number;
   infoPositionX?: number;
   infoPositionY?: number;
+  emojiSize?: number;
+  minAngle?: number;
+  maxAngle?: number;
 }
 
 export interface DashboardWidget {

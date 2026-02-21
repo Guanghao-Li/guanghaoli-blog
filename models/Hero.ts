@@ -8,12 +8,18 @@ const HeroSchema = new mongoose.Schema(
     subtitle: { type: String, default: "" },
     subtitleZh: { type: String, default: "" },
     avatar: { type: String, default: undefined },
-    phone: { type: String, default: "" },
-    email: { type: String, default: "" },
-    address: { type: String, default: "" },
+    phoneEn: { type: String, default: "" },
+    phoneZh: { type: String, default: "" },
+    emailEn: { type: String, default: "" },
+    emailZh: { type: String, default: "" },
+    addressEn: { type: String, default: "" },
+    addressZh: { type: String, default: "" },
     infoFontSize: { type: Number, default: 14 },
     infoPositionX: { type: Number, default: 0 },
     infoPositionY: { type: Number, default: 0 },
+    emojiSize: { type: Number, default: 28 },
+    minAngle: { type: Number, default: 45 },
+    maxAngle: { type: Number, default: 135 },
   },
   { _id: true, timestamps: false }
 );
@@ -32,12 +38,18 @@ export async function upsertHero(data: {
   subtitle?: string;
   subtitleZh?: string;
   avatar?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
+  phoneEn?: string;
+  phoneZh?: string;
+  emailEn?: string;
+  emailZh?: string;
+  addressEn?: string;
+  addressZh?: string;
   infoFontSize?: number;
   infoPositionX?: number;
   infoPositionY?: number;
+  emojiSize?: number;
+  minAngle?: number;
+  maxAngle?: number;
 }) {
   await connectDB();
   const doc = await Hero.findOneAndUpdate(

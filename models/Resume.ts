@@ -19,6 +19,9 @@ const ResumeSchema = new mongoose.Schema(
     paperStyle: PaperStyleSchema,
     basicInfo: mongoose.Schema.Types.Mixed,
     sections: mongoose.Schema.Types.Mixed,
+    infoFontSize: { type: Number, default: 14 },
+    infoPositionX: { type: Number, default: 0 },
+    infoPositionY: { type: Number, default: 0 },
   },
   { _id: true, timestamps: false }
 );
@@ -39,6 +42,9 @@ export async function upsertResume(data: {
   paperStyle?: { maxWidth?: string; minHeight?: string; theme?: string };
   basicInfo?: any;
   sections?: any;
+  infoFontSize?: number;
+  infoPositionX?: number;
+  infoPositionY?: number;
 }) {
   await connectDB();
   const doc = await Resume.findOneAndUpdate(

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, LayoutGroup, useScroll, useTransform, useInView } from "framer-motion";
 import Image from "next/image";
 import { useScrollSection } from "@/contexts/ScrollSectionContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -9,6 +9,7 @@ import { useCmsResume, useCmsHero } from "@/contexts/CmsContext";
 import { getResumeData } from "@/lib/resume-data";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import PhysicsEmoji, { usePhysicsEmojis } from "./PhysicsEmoji";
 
 const AVATAR_SRC = "/avatar-placeholder.svg";
 
@@ -27,7 +28,7 @@ export default function HeroResumeSection() {
   };
 
   return (
-    <>
+    <LayoutGroup>
       <div
         id="hero"
         ref={(el) => {
@@ -47,7 +48,7 @@ export default function HeroResumeSection() {
       >
         <ResumeContent isResumeActive={isResumeActive} />
       </div>
-    </>
+    </LayoutGroup>
   );
 }
 
@@ -56,6 +57,10 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const scrollContainerRef = useRef<HTMLElement | null>(null);
   const { lang, t } = useLanguage();
   const hero = useCmsHero();
+  const emojiSize = hero?.emojiSize ?? 28;
+  const minAngle = hero?.minAngle ?? 45;
+  const maxAngle = hero?.maxAngle ?? 135;
+  const { particles, spawn, remove } = usePhysicsEmojis(emojiSize, minAngle, maxAngle);
 
   useEffect(() => {
     scrollContainerRef.current = document.querySelector(".scroll-snap-container");
@@ -75,15 +80,19 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const fontSize = hero?.infoFontSize ?? 14;
   const posX = hero?.infoPositionX ?? 0;
   const posY = hero?.infoPositionY ?? 0;
-  const hasContact = !!(hero?.phone || hero?.email || hero?.address);
+  const phone = lang === "zh" ? hero?.phoneZh : hero?.phoneEn;
+  const email = lang === "zh" ? hero?.emailZh : hero?.emailEn;
+  const address = lang === "zh" ? hero?.addressZh : hero?.addressEn;
+  const hasContact = !!(phone || email || address);
 
   return (
-    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-16 md:-translate-y-20">
+    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-20 md:-translate-y-24">
+      <PhysicsEmoji particles={particles} onRemove={remove} emojiSize={emojiSize} />
       <div ref={containerRef} className="absolute inset-0" aria-hidden />
       {!isResumeActive && (
         <motion.div
           style={{ y, opacity, filter: blurFilter }}
-          className="absolute inset-0 flex flex-col items-center justify-center px-6"
+          className="absolute inset-0 flex flex-col items-center justify-center px-6 mb-8"
         >
           <div className="flex-shrink-0 w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 relative flex items-center justify-center">
             <motion.div
@@ -93,7 +102,7 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
               className="absolute inset-0 -m-4 rounded-full bg-slate-300/60 dark:bg-zinc-700/60"
               aria-hidden
             />
-            <SharedAvatar layoutId="hero-avatar" isResume={false} />
+            <SharedAvatar layoutId="hero-avatar" isResume={false} onAvatarClick={spawn} />
           </div>
           <SharedName layoutId="hero-name" isResume={false} lang={lang} />
           <motion.p
@@ -111,7 +120,7 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
           {hasContact && (
             <motion.div
               layout
-              className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-zinc-500 dark:text-zinc-400"
+              className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-zinc-500 dark:text-zinc-400"
               style={{
                 fontSize: `${fontSize}px`,
                 transform: `translate(${posX}px, ${posY}px)`,
@@ -120,9 +129,21 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              {hero?.phone && <span>{hero.phone}</span>}
-              {hero?.email && <span>{hero.email}</span>}
-              {hero?.address && <span>{hero.address}</span>}
+              {phone && (
+                <motion.span layoutId="contact-phone">
+                  {phone}
+                </motion.span>
+              )}
+              {email && (
+                <motion.span layoutId="contact-email">
+                  {email}
+                </motion.span>
+              )}
+              {address && (
+                <motion.span layoutId="contact-address">
+                  {address}
+                </motion.span>
+              )}
             </motion.div>
           )}
         </motion.div>
@@ -136,7 +157,16 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
   const isInView = useInView(paperRef, { once: true, margin: "-80px" });
   const { lang } = useLanguage();
   const cmsResume = useCmsResume();
+  const hero = useCmsHero();
   const fallbackData = getResumeData(lang);
+
+  const resumePhone = lang === "zh" ? hero?.phoneZh : hero?.phoneEn;
+  const resumeEmail = lang === "zh" ? hero?.emailZh : hero?.emailEn;
+  const resumeAddress = lang === "zh" ? hero?.addressZh : hero?.addressEn;
+  const hasResumeContact = isResumeActive && !!(resumePhone || resumeEmail || resumeAddress);
+  const resumeFontSize = hero?.infoFontSize ?? 14;
+  const resumePosX = hero?.infoPositionX ?? 0;
+  const resumePosY = hero?.infoPositionY ?? 0;
 
   const name = cmsResume
     ? lang === "zh"
@@ -171,6 +201,35 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
           <div className="relative flex min-h-[200px] flex-col md:flex-row md:items-start md:justify-between">
             <div className="flex-1 min-w-0">
               {isResumeActive && <SharedName layoutId="hero-name" isResume={true} lang={lang} customName={name} />}
+              {hasResumeContact && (
+                <motion.div
+                  layout
+                  className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[hsl(var(--text-muted))]"
+                  style={{
+                    fontSize: `${resumeFontSize}px`,
+                    transform: `translate(${resumePosX}px, ${resumePosY}px)`,
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {resumePhone && (
+                    <motion.span layoutId="contact-phone" className="inline-flex items-center gap-1.5">
+                      <span aria-hidden>📱</span> {resumePhone}
+                    </motion.span>
+                  )}
+                  {resumeEmail && (
+                    <motion.span layoutId="contact-email" className="inline-flex items-center gap-1.5">
+                      <span aria-hidden>📧</span> {resumeEmail}
+                    </motion.span>
+                  )}
+                  {resumeAddress && (
+                    <motion.span layoutId="contact-address" className="inline-flex items-center gap-1.5">
+                      <span aria-hidden>🏠</span> {resumeAddress}
+                    </motion.span>
+                  )}
+                </motion.div>
+              )}
               {!hasCmsResume && (
                 <motion.div
                   layout
@@ -187,7 +246,7 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
               )}
             </div>
             <div className="mt-6 flex-shrink-0 md:mt-0">
-              {isResumeActive && <SharedAvatar layoutId="hero-avatar" isResume={true} />}
+              {isResumeActive && <SharedAvatar layoutId="hero-avatar" isResume={true} onAvatarClick={undefined} />}
             </div>
           </div>
           <div className="mt-12 space-y-8 border-t border-[hsl(var(--border))] pt-8">
@@ -260,7 +319,15 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
   );
 }
 
-function SharedAvatar({ layoutId, isResume }: { layoutId: string; isResume: boolean }) {
+function SharedAvatar({
+  layoutId,
+  isResume,
+  onAvatarClick,
+}: {
+  layoutId: string;
+  isResume: boolean;
+  onAvatarClick?: (x: number, y: number) => void;
+}) {
   const hero = useCmsHero();
   const avatarSrc = hero?.avatar || AVATAR_SRC;
   const isDataUrl = avatarSrc.startsWith("data:");
@@ -277,11 +344,16 @@ function SharedAvatar({ layoutId, isResume }: { layoutId: string; isResume: bool
     >
       <motion.div
         layout={false}
-        className="absolute inset-0 flex items-center justify-center"
+        className="absolute inset-0 flex items-center justify-center cursor-pointer"
         style={{ transformOrigin: "center center" }}
         whileHover={
           !isResume
             ? { y: -8, transition: { duration: 0.2 } }
+            : undefined
+        }
+        onClick={
+          !isResume && onAvatarClick
+            ? (e) => onAvatarClick(e.clientX, e.clientY)
             : undefined
         }
       >

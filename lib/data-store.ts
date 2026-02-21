@@ -9,12 +9,18 @@ export interface CmsData {
     subtitle: string;
     subtitleZh: string;
     avatar?: string;
-    phone?: string;
-    email?: string;
-    address?: string;
+    phoneEn?: string;
+    phoneZh?: string;
+    emailEn?: string;
+    emailZh?: string;
+    addressEn?: string;
+    addressZh?: string;
     infoFontSize?: number;
     infoPositionX?: number;
     infoPositionY?: number;
+    emojiSize?: number;
+    minAngle?: number;
+    maxAngle?: number;
   };
   resume: ResumeData;
   projects: Array<{
@@ -71,12 +77,18 @@ export const DEFAULT_DATA: CmsData = {
     nameZh: "李光浩",
     subtitle: "Embedded Systems Engineer",
     subtitleZh: "嵌入式系统工程师 / Embedded Systems Engineer",
-    phone: "",
-    email: "",
-    address: "",
+    phoneEn: "",
+    phoneZh: "",
+    emailEn: "",
+    emailZh: "",
+    addressEn: "",
+    addressZh: "",
     infoFontSize: 14,
     infoPositionX: 0,
     infoPositionY: 0,
+    emojiSize: 28,
+    minAngle: 45,
+    maxAngle: 135,
   },
   resume: {
     nameEn: "Guanghao Li",

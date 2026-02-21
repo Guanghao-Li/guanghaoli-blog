@@ -1,15 +1,17 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, FileText, FolderOpen, FlaskConical } from "lucide-react";
+import Link from "next/link";
+import { Home, FileText, FolderOpen, FlaskConical, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProjectDetail } from "@/contexts/ProjectDetailContext";
 
 const NAV_ITEMS = [
-  { id: "hero", label: "Home", icon: Home, href: "#hero" },
-  { id: "resume", label: "Resume", icon: FileText, href: "#resume" },
-  { id: "projects", label: "Projects", icon: FolderOpen, href: "#projects" },
-  { id: "lab", label: "Lab", icon: FlaskConical, href: "#lab" },
+  { id: "hero", label: "Home", icon: Home, href: "#hero", external: false },
+  { id: "resume", label: "Resume", icon: FileText, href: "#resume", external: false },
+  { id: "projects", label: "Projects", icon: FolderOpen, href: "#projects", external: false },
+  { id: "lab", label: "Lab", icon: FlaskConical, href: "#lab", external: false },
+  { id: "admin", label: "后台", icon: Settings, href: "/admin", external: true },
 ];
 
 export default function Dock() {
@@ -42,6 +44,24 @@ export default function Dock() {
       >
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
+          const isAdmin = item.id === "admin";
+          if (item.external) {
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200",
+                  "hover:scale-110 hover:bg-[hsl(var(--accent-muted))]",
+                  "active:scale-95",
+                  isAdmin && "opacity-60 hover:opacity-100"
+                )}
+                aria-label={item.label}
+              >
+                <Icon className="h-5 w-5" strokeWidth={2} />
+              </Link>
+            );
+          }
           return (
             <button
               key={item.id}

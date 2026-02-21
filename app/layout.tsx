@@ -8,7 +8,7 @@ import { CmsProvider } from "@/contexts/CmsContext";
 import SiteChrome from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
-  title: "Lee | 作品集",
+  title: "Lee的个人站",
   description: "嵌入式系统工程师 · Embedded Systems Engineer",
 };
 
