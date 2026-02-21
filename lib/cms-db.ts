@@ -4,6 +4,7 @@ import { getHeroDoc, upsertHero } from "@/models/Hero";
 import { getResumeDoc, upsertResume } from "@/models/Resume";
 import { getProjects, replaceProjects } from "@/models/Project";
 import { getIotDoc, upsertIot } from "@/models/Iot";
+import { getDashboardDoc, upsertDashboard } from "@/models/Dashboard";
 
 function toHeroPayload(hero: CmsData["hero"]) {
   return {
@@ -19,12 +20,14 @@ function toResumePayload(resume: CmsData["resume"]) {
   return {
     nameEn: resume?.nameEn ?? DEFAULT_DATA.resume.nameEn,
     nameZh: resume?.nameZh ?? DEFAULT_DATA.resume.nameZh,
-    basicInfo: resume?.basicInfo ?? DEFAULT_DATA.resume.basicInfo,
-    sections: resume?.sections ?? DEFAULT_DATA.resume.sections,
+    contentEn: resume?.contentEn ?? DEFAULT_DATA.resume.contentEn,
+    contentZh: resume?.contentZh ?? DEFAULT_DATA.resume.contentZh,
+    paperStyle: resume?.paperStyle ?? DEFAULT_DATA.resume.paperStyle,
   };
 }
 
 function toProjectsPayload(projects: CmsData["projects"]) {
+  const now = new Date();
   return (projects ?? DEFAULT_DATA.projects).map((p) => ({
     id: p.id,
     title: p.title ?? "",
@@ -33,9 +36,16 @@ function toProjectsPayload(projects: CmsData["projects"]) {
     descriptionZh: p.descriptionZh ?? "",
     tags: p.tags ?? [],
     size: p.size ?? "medium",
+    colSpan: p.colSpan ?? 1,
+    rowSpan: p.rowSpan ?? 1,
+    order: p.order ?? 0,
+    coverImage: p.coverImage ?? "",
+    readTime: p.readTime ?? 0,
     markdownEn: p.markdownEn ?? p.markdown ?? "",
     markdownZh: p.markdownZh ?? p.markdown ?? "",
     ...(p.uiSettings && { uiSettings: p.uiSettings }),
+    createdAt: p.createdAt ? new Date(p.createdAt) : now,
+    updatedAt: now,
   }));
 }
 
@@ -45,15 +55,30 @@ function toIotPayload(iot: CmsData["iot"]) {
     titleZh: iot?.titleZh ?? DEFAULT_DATA.iot.titleZh,
     description: iot?.description ?? DEFAULT_DATA.iot.description,
     descriptionZh: iot?.descriptionZh ?? DEFAULT_DATA.iot.descriptionZh,
+    chartConfig: iot?.chartConfig ?? DEFAULT_DATA.iot.chartConfig ?? {},
+  };
+}
+
+function toDashboardPayload(dashboard: CmsData["dashboard"]) {
+  return {
+    widgets: (dashboard?.widgets ?? DEFAULT_DATA.dashboard.widgets).map((w) => ({
+      id: w.id,
+      type: w.type,
+      order: w.order ?? 0,
+      colSpan: w.colSpan ?? 1,
+      rowSpan: w.rowSpan ?? 1,
+      config: w.config ?? {},
+    })),
   };
 }
 
 export async function loadCmsData(): Promise<CmsData> {
-  const [heroDoc, resumeDoc, projectDocs, iotDoc] = await Promise.all([
+  const [heroDoc, resumeDoc, projectDocs, iotDoc, dashboardDoc] = await Promise.all([
     getHeroDoc(),
     getResumeDoc(),
     getProjects(),
     getIotDoc(),
+    getDashboardDoc(),
   ]);
 
   const hero = heroDoc
@@ -70,8 +95,9 @@ export async function loadCmsData(): Promise<CmsData> {
     ? {
         nameEn: resumeDoc.nameEn ?? DEFAULT_DATA.resume.nameEn,
         nameZh: resumeDoc.nameZh ?? DEFAULT_DATA.resume.nameZh,
-        basicInfo: resumeDoc.basicInfo ?? DEFAULT_DATA.resume.basicInfo,
-        sections: resumeDoc.sections ?? DEFAULT_DATA.resume.sections,
+        contentEn: resumeDoc.contentEn ?? DEFAULT_DATA.resume.contentEn,
+        contentZh: resumeDoc.contentZh ?? DEFAULT_DATA.resume.contentZh,
+        paperStyle: resumeDoc.paperStyle ?? DEFAULT_DATA.resume.paperStyle,
       }
     : DEFAULT_DATA.resume;
 
@@ -87,6 +113,13 @@ export async function loadCmsData(): Promise<CmsData> {
             descriptionZh: rest.descriptionZh ?? "",
             tags: rest.tags ?? [],
             size: (rest.size as "large" | "medium") ?? "medium",
+            colSpan: rest.colSpan ?? 1,
+            rowSpan: rest.rowSpan ?? 1,
+            order: rest.order ?? 0,
+            coverImage: rest.coverImage ?? "",
+            readTime: rest.readTime ?? 0,
+            createdAt: rest.createdAt ? new Date(rest.createdAt).toISOString() : undefined,
+            updatedAt: rest.updatedAt ? new Date(rest.updatedAt).toISOString() : undefined,
             markdownEn: rest.markdownEn ?? "",
             markdownZh: rest.markdownZh ?? "",
             ...(rest.uiSettings && { uiSettings: rest.uiSettings }),
@@ -100,10 +133,24 @@ export async function loadCmsData(): Promise<CmsData> {
         titleZh: iotDoc.titleZh ?? DEFAULT_DATA.iot.titleZh,
         description: iotDoc.description ?? DEFAULT_DATA.iot.description,
         descriptionZh: iotDoc.descriptionZh ?? DEFAULT_DATA.iot.descriptionZh,
+        chartConfig: iotDoc.chartConfig ?? DEFAULT_DATA.iot.chartConfig ?? {},
       }
     : DEFAULT_DATA.iot;
 
-  return { hero, resume, projects, iot };
+  const dashboard = dashboardDoc?.widgets
+    ? {
+        widgets: (dashboardDoc.widgets as any[]).map((w) => ({
+          id: w.id,
+          type: w.type,
+          order: w.order ?? 0,
+          colSpan: w.colSpan ?? 1,
+          rowSpan: w.rowSpan ?? 1,
+          config: w.config ?? {},
+        })),
+      }
+    : DEFAULT_DATA.dashboard;
+
+  return { hero, resume, projects, iot, dashboard };
 }
 
 export async function saveCmsData(data: CmsData): Promise<void> {
@@ -112,5 +159,6 @@ export async function saveCmsData(data: CmsData): Promise<void> {
     upsertResume(toResumePayload(data.resume)),
     replaceProjects(toProjectsPayload(data.projects)),
     upsertIot(toIotPayload(data.iot)),
+    upsertDashboard(toDashboardPayload(data.dashboard)),
   ]);
 }

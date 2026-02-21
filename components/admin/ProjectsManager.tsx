@@ -51,6 +51,7 @@ export default function ProjectsManager() {
 
   const addProject = () => {
     const id = String(Date.now());
+    const nextOrder = projects.length > 0 ? Math.max(...projects.map((p) => p.order ?? 0)) + 1 : 0;
     setProjects([
       ...projects,
       {
@@ -61,6 +62,11 @@ export default function ProjectsManager() {
         descriptionZh: "",
         tags: [],
         size: "medium",
+        colSpan: 1,
+        rowSpan: 1,
+        order: nextOrder,
+        coverImage: "",
+        readTime: 0,
         markdownEn: "## Overview\n\nWrite project introduction.\n\n### Code Sample\n\n```typescript\nconst x = 1;\n```",
         markdownZh: "## 项目概述\n\n在此编写项目介绍。\n\n### 代码示例\n\n```typescript\nconst x = 1;\n```",
         uiSettings: {},
@@ -112,6 +118,71 @@ export default function ProjectsManager() {
           </div>
           {editing === p.id && (
             <div className="mt-4 space-y-3">
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div>
+                  <label className="block text-xs text-zinc-500">封面图 URL 或 Base64</label>
+                  <input
+                    value={p.coverImage ?? ""}
+                    onChange={(e) => updateProject(p.id, { coverImage: e.target.value })}
+                    placeholder="/cover.jpg 或 data:image/..."
+                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500">阅读时间 (分钟)</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={p.readTime ?? 0}
+                    onChange={(e) => updateProject(p.id, { readTime: Math.max(0, Number(e.target.value) || 0) })}
+                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-4">
+                <div>
+                  <label className="block text-xs text-zinc-500">colSpan</label>
+                  <select
+                    value={p.colSpan ?? 1}
+                    onChange={(e) => updateProject(p.id, { colSpan: Number(e.target.value) })}
+                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                  >
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500">rowSpan</label>
+                  <select
+                    value={p.rowSpan ?? 1}
+                    onChange={(e) => updateProject(p.id, { rowSpan: Number(e.target.value) })}
+                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                  >
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500">order</label>
+                  <input
+                    type="number"
+                    value={p.order ?? 0}
+                    onChange={(e) => updateProject(p.id, { order: Number(e.target.value) || 0 })}
+                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-500">size</label>
+                  <select
+                    value={p.size ?? "medium"}
+                    onChange={(e) => updateProject(p.id, { size: e.target.value as "large" | "medium" })}
+                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                  >
+                    <option value="medium">medium</option>
+                    <option value="large">large</option>
+                  </select>
+                </div>
+              </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 <div>
                   <label className="block text-xs text-zinc-500">标题 (英文)</label>

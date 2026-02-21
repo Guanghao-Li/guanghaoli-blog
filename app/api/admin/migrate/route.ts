@@ -27,6 +27,7 @@ export async function GET() {
       resume,
       projects,
       iot: parsed.iot ?? DEFAULT_DATA.iot,
+      dashboard: parsed.dashboard ?? DEFAULT_DATA.dashboard,
     };
 
     await saveCmsData(data);

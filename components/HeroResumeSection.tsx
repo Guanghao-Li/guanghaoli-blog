@@ -121,55 +121,47 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
       : cmsResume.nameEn
     : fallbackData.personal.name;
 
-  const hasCmsResume = cmsResume && (cmsResume.basicInfo.length > 0 || cmsResume.sections.some((s) => s.items.length > 0));
+  const hasCmsResume = cmsResume && (!!cmsResume.contentEn || !!cmsResume.contentZh);
 
   return (
     <section
       id="resume"
       className="relative flex min-h-screen w-full flex-col px-6 py-16 md:px-12 md:py-24"
     >
-      <div ref={paperRef} className="mx-auto w-full max-w-3xl">
+      <div
+        ref={paperRef}
+        className={`mx-auto w-full ${cmsResume?.paperStyle?.maxWidth ?? "max-w-3xl"}`}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={isInView ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
           className={`
             rounded-2xl border shadow-xl
-            bg-white/90 dark:bg-zinc-800/90
-            border-[hsl(var(--border))]
             px-8 py-10 md:px-12 md:py-12
+            ${cmsResume?.paperStyle?.minHeight ?? ""}
+            ${cmsResume?.paperStyle?.theme === "blueprint"
+              ? "bg-sky-50/95 dark:bg-sky-950/30 border-sky-300 dark:border-sky-700"
+              : "bg-white/90 dark:bg-zinc-800/90 border-[hsl(var(--border))]"}
           `}
         >
           <div className="relative flex min-h-[200px] flex-col md:flex-row md:items-start md:justify-between">
             <div className="flex-1 min-w-0">
               {isResumeActive && <SharedName layoutId="hero-name" isResume={true} lang={lang} customName={name} />}
-              <motion.div
-                layout
-                className="mt-4 space-y-2 text-[hsl(var(--text-muted))]"
-                initial={{ opacity: 0.8 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                {hasCmsResume && cmsResume ? (
-                  <>
-                    {cmsResume.basicInfo.map((item) => (
-                      <p key={item.id}>
-                        <span className="text-[hsl(var(--text))] font-medium">
-                          {(lang === "zh" ? item.labelZh : item.labelEn) || "—"}:
-                        </span>{" "}
-                        {lang === "zh" ? item.valueZh : item.valueEn}
-                      </p>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.nameLabel}:</span> {fallbackData.personal.name}</p>
-                    <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.locationLabel}:</span> {fallbackData.personal.location}</p>
-                    <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.phoneLabel}:</span> {fallbackData.personal.phone}</p>
-                    <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.emailLabel}:</span> {fallbackData.personal.email}</p>
-                  </>
-                )}
-              </motion.div>
+              {!hasCmsResume && (
+                <motion.div
+                  layout
+                  className="mt-4 space-y-2 text-[hsl(var(--text-muted))]"
+                  initial={{ opacity: 0.8 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.nameLabel}:</span> {fallbackData.personal.name}</p>
+                  <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.locationLabel}:</span> {fallbackData.personal.location}</p>
+                  <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.phoneLabel}:</span> {fallbackData.personal.phone}</p>
+                  <p><span className="text-[hsl(var(--text))] font-medium">{fallbackData.personal.emailLabel}:</span> {fallbackData.personal.email}</p>
+                </motion.div>
+              )}
             </div>
             <div className="mt-6 flex-shrink-0 md:mt-0">
               {isResumeActive && <SharedAvatar layoutId="hero-avatar" isResume={true} />}
@@ -177,42 +169,11 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
           </div>
           <div className="mt-12 space-y-8 border-t border-[hsl(var(--border))] pt-8">
             {hasCmsResume && cmsResume ? (
-              [...cmsResume.sections]
-                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-                .map((sec) => (
-                  <ResumeBlock
-                    key={sec.id}
-                    title={lang === "zh" ? sec.titleZh : sec.titleEn}
-                  >
-                    {sec.items.map((item) => {
-                      const title = (lang === "zh" ? item.titleZh : item.titleEn) || (lang === "zh" ? item.titleEn : item.titleZh) || item.title || "";
-                      const subtitle = (lang === "zh" ? item.subtitleZh : item.subtitleEn) || (lang === "zh" ? item.subtitleEn : item.subtitleZh) || item.subtitle || "";
-                      const contentMd = (lang === "zh" ? item.contentMarkdownZh : item.contentMarkdownEn) || (lang === "zh" ? item.contentMarkdownEn : item.contentMarkdownZh) || item.contentMarkdown || "";
-                      return (
-                        <div key={item.id} className="mb-6 last:mb-0">
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1">
-                            {title && <p className="font-semibold">{title}</p>}
-                            {item.period && (
-                              <p className="text-[hsl(var(--text-muted))] text-sm text-right shrink-0">
-                                {item.period}
-                              </p>
-                            )}
-                          </div>
-                          {subtitle && (
-                            <p className="text-[hsl(var(--text-muted))] mt-0.5">{subtitle}</p>
-                          )}
-                          {contentMd && (
-                            <div className="mt-2 prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 text-[hsl(var(--text-muted))]">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {contentMd}
-                              </ReactMarkdown>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </ResumeBlock>
-                ))
+              <div className="prose prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-headings:mt-6 prose-headings:mb-2 text-[hsl(var(--text-muted))]">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {(lang === "zh" ? cmsResume.contentZh : cmsResume.contentEn) || (lang === "zh" ? cmsResume.contentEn : cmsResume.contentZh) || ""}
+                </ReactMarkdown>
+              </div>
             ) : (
               <>
                 <ResumeBlock title={lang === "zh" ? "教育背景" : "Education"}>

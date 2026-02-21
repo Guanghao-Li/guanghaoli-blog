@@ -1,38 +1,11 @@
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 
-const BasicInfoItemSchema = new mongoose.Schema(
+const PaperStyleSchema = new mongoose.Schema(
   {
-    id: String,
-    labelEn: String,
-    labelZh: String,
-    valueEn: String,
-    valueZh: String,
-  },
-  { _id: false }
-);
-
-const SectionItemSchema = new mongoose.Schema(
-  {
-    id: String,
-    period: String,
-    titleEn: String,
-    titleZh: String,
-    subtitleEn: String,
-    subtitleZh: String,
-    contentMarkdownEn: String,
-    contentMarkdownZh: String,
-  },
-  { _id: false }
-);
-
-const SectionSchema = new mongoose.Schema(
-  {
-    id: String,
-    titleEn: String,
-    titleZh: String,
-    order: Number,
-    items: [SectionItemSchema],
+    maxWidth: { type: String, default: "max-w-4xl" },
+    minHeight: { type: String, default: "min-h-[800px]" },
+    theme: { type: String, enum: ["default", "blueprint"], default: "default" },
   },
   { _id: false }
 );
@@ -41,8 +14,11 @@ const ResumeSchema = new mongoose.Schema(
   {
     nameEn: { type: String, default: "" },
     nameZh: { type: String, default: "" },
-    basicInfo: [BasicInfoItemSchema],
-    sections: [SectionSchema],
+    contentEn: { type: String, default: "" },
+    contentZh: { type: String, default: "" },
+    paperStyle: PaperStyleSchema,
+    basicInfo: mongoose.Schema.Types.Mixed,
+    sections: mongoose.Schema.Types.Mixed,
   },
   { _id: true, timestamps: false }
 );
@@ -58,8 +34,11 @@ export async function getResumeDoc() {
 export async function upsertResume(data: {
   nameEn?: string;
   nameZh?: string;
-  basicInfo?: any[];
-  sections?: any[];
+  contentEn?: string;
+  contentZh?: string;
+  paperStyle?: { maxWidth?: string; minHeight?: string; theme?: string };
+  basicInfo?: any;
+  sections?: any;
 }) {
   await connectDB();
   const doc = await Resume.findOneAndUpdate(

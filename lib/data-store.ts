@@ -1,5 +1,6 @@
 import { PROJECTS } from "./projects-data";
 import type { ResumeData } from "./resume-types";
+import { DEFAULT_PAPER_STYLE } from "./resume-types";
 
 export interface CmsData {
   hero: {
@@ -18,6 +19,13 @@ export interface CmsData {
     descriptionZh: string;
     tags: string[];
     size: "large" | "medium";
+    colSpan?: number;
+    rowSpan?: number;
+    order?: number;
+    coverImage?: string;
+    readTime?: number;
+    createdAt?: string;
+    updatedAt?: string;
     markdownEn?: string;
     markdownZh?: string;
     markdown?: string;
@@ -32,6 +40,22 @@ export interface CmsData {
     titleZh: string;
     description: string;
     descriptionZh: string;
+    chartConfig?: {
+      chartType?: "line" | "bar" | "area";
+      apiKey?: string;
+      yAxisLabel?: string;
+      metricKey?: string;
+    };
+  };
+  dashboard: {
+    widgets: Array<{
+      id: string;
+      type: "hardware-stack" | "iot-monitor" | "pcb-showcase" | "github-stats";
+      order?: number;
+      colSpan?: number;
+      rowSpan?: number;
+      config?: Record<string, any>;
+    }>;
   };
 }
 
@@ -45,16 +69,9 @@ export const DEFAULT_DATA: CmsData = {
   resume: {
     nameEn: "Guanghao Li",
     nameZh: "李光浩",
-    basicInfo: [
-      { id: "1", labelEn: "Location", labelZh: "居住地", valueEn: "Hoboken, NJ", valueZh: "湖北武汉" },
-      { id: "2", labelEn: "Phone", labelZh: "电话", valueEn: "+1 5513879325", valueZh: "+86 18976620394" },
-      { id: "3", labelEn: "Email", labelZh: "邮箱", valueEn: "gli42@stevens.edu", valueZh: "leegh2248@outlook.com" },
-    ],
-    sections: [
-      { id: "edu", titleEn: "Education", titleZh: "教育背景", order: 0, items: [] },
-      { id: "work", titleEn: "Work Experience", titleZh: "工作经历", order: 1, items: [] },
-      { id: "skills", titleEn: "Skills", titleZh: "专业技能", order: 2, items: [] },
-    ],
+    contentEn: "## Education\n\n- **Stevens Institute of Technology** - M.Eng. EE\n- **Hefei University of Technology** - B.S. Biomedical Engineering\n\n## Experience\n\n- Embedded Systems Engineer\n- Full-stack Development",
+    contentZh: "## 教育背景\n\n- **Stevens Institute of Technology** - 电气工程硕士\n- **合肥工业大学** - 生物医学工程学士\n\n## 经历\n\n- 嵌入式系统工程师\n- 全栈开发",
+    paperStyle: DEFAULT_PAPER_STYLE,
   },
   projects: PROJECTS,
   iot: {
@@ -62,94 +79,79 @@ export const DEFAULT_DATA: CmsData = {
     titleZh: "IoT Dashboard",
     description: "Reserved visualization area for future MCU data",
     descriptionZh: "为未来单片机数据预留的可视化区域",
+    chartConfig: {
+      chartType: "line" as const,
+      apiKey: "",
+      yAxisLabel: "Value",
+      metricKey: "default",
+    },
+  },
+  dashboard: {
+    widgets: [
+      { id: "w1", type: "hardware-stack", order: 0, colSpan: 1, rowSpan: 1, config: { stack: ["STM32", "ESP32", "Raspberry Pi"] } },
+      { id: "w2", type: "iot-monitor", order: 1, colSpan: 1, rowSpan: 1, config: {} },
+      { id: "w3", type: "pcb-showcase", order: 2, colSpan: 1, rowSpan: 1, config: { title: "PCB Design" } },
+      { id: "w4", type: "github-stats", order: 3, colSpan: 1, rowSpan: 1, config: { username: "" } },
+    ],
   },
 };
 
-function migrateResumeItem(it: any): any {
-  if (!it) return it;
-  const hasNew = "titleEn" in it || "titleZh" in it;
-  if (hasNew) return it;
-  const oldTitle = it.title ?? "";
-  const oldSub = it.subtitle ?? "";
-  const oldMd = it.contentMarkdown ?? "";
-  return {
-    ...it,
-    titleEn: it.titleEn ?? oldTitle,
-    titleZh: it.titleZh ?? oldTitle,
-    subtitleEn: it.subtitleEn ?? oldSub,
-    subtitleZh: it.subtitleZh ?? oldSub,
-    contentMarkdownEn: it.contentMarkdownEn ?? oldMd,
-    contentMarkdownZh: it.contentMarkdownZh ?? oldMd,
-  };
+function sectionsToMarkdownEn(sections: any[]): string {
+  if (!Array.isArray(sections)) return "";
+  return sections
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((sec) => {
+      const title = sec.titleEn || sec.titleZh || "Section";
+      const items = (sec.items || []).map((i: any) => {
+        const t = i.titleEn || i.titleZh || i.title || "";
+        const sub = i.subtitleEn || i.subtitleZh || i.subtitle || "";
+        const period = i.period ? ` *${i.period}*` : "";
+        const body = i.contentMarkdownEn || i.contentMarkdownZh || i.contentMarkdown || "";
+        return `### ${t}${period}\n${sub ? `${sub}\n\n` : ""}${body}`;
+      }).join("\n\n");
+      return `## ${title}\n\n${items}`;
+    })
+    .join("\n\n");
 }
 
-function migrateResumeItems(r: ResumeData): ResumeData {
-  return {
-    ...r,
-    sections: r.sections.map((sec) => ({
-      ...sec,
-      items: sec.items.map(migrateResumeItem),
-    })),
-  };
+function sectionsToMarkdownZh(sections: any[]): string {
+  if (!Array.isArray(sections)) return "";
+  return sections
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((sec) => {
+      const title = sec.titleZh || sec.titleEn || "区块";
+      const items = (sec.items || []).map((i: any) => {
+        const t = i.titleZh || i.titleEn || i.title || "";
+        const sub = i.subtitleZh || i.subtitleEn || i.subtitle || "";
+        const period = i.period ? ` *${i.period}*` : "";
+        const body = i.contentMarkdownZh || i.contentMarkdownEn || i.contentMarkdown || "";
+        return `### ${t}${period}\n${sub ? `${sub}\n\n` : ""}${body}`;
+      }).join("\n\n");
+      return `## ${title}\n\n${items}`;
+    })
+    .join("\n\n");
 }
 
 export function migrateResume(parsed: any): ResumeData {
   const def = DEFAULT_DATA.resume;
   const r = parsed?.resume;
   if (!r) return def;
-  if (Array.isArray(r.basicInfo) && Array.isArray(r.sections)) {
-    return migrateResumeItems(r as ResumeData);
+  if (r.contentEn !== undefined || r.contentZh !== undefined) {
+    return {
+      nameEn: r.nameEn ?? def.nameEn,
+      nameZh: r.nameZh ?? def.nameZh,
+      contentEn: r.contentEn ?? def.contentEn,
+      contentZh: r.contentZh ?? def.contentZh,
+      paperStyle: r.paperStyle ?? def.paperStyle,
+    };
   }
-  const basicInfo = [
-    { id: "1", labelEn: "Location", labelZh: "居住地", valueEn: r.personal?.en?.location ?? "", valueZh: r.personal?.zh?.location ?? "" },
-    { id: "2", labelEn: "Phone", labelZh: "电话", valueEn: r.personal?.en?.phone ?? "", valueZh: r.personal?.zh?.phone ?? "" },
-    { id: "3", labelEn: "Email", labelZh: "邮箱", valueEn: r.personal?.en?.email ?? "", valueZh: r.personal?.zh?.email ?? "" },
-  ];
-  const sections: ResumeData["sections"] = [];
-  if (Array.isArray(r.education) && r.education.length > 0) {
-    sections.push({
-      id: "edu",
-      titleEn: "Education",
-      titleZh: "教育背景",
-      order: 0,
-      items: r.education.map((e: any, i: number) => ({
-        id: `e-${i}`,
-        period: e.period ?? "",
-        titleEn: e.school ?? "",
-        titleZh: e.school ?? "",
-        subtitleEn: e.degree ?? "",
-        subtitleZh: e.degree ?? "",
-        contentMarkdownEn: "",
-        contentMarkdownZh: "",
-      })),
-    });
-  }
-  if (Array.isArray(r.work) && r.work.length > 0) {
-    sections.push({
-      id: "work",
-      titleEn: "Work Experience",
-      titleZh: "工作经历",
-      order: 1,
-      items: r.work.map((w: any, i: number) => {
-        const md = (w.bullets ?? []).map((b: string) => `- ${b}`).join("\n");
-        return {
-          id: `w-${i}`,
-          period: w.period ?? "",
-          titleEn: w.company ?? "",
-          titleZh: w.company ?? "",
-          subtitleEn: w.role ?? "",
-          subtitleZh: w.role ?? "",
-          contentMarkdownEn: md,
-          contentMarkdownZh: md,
-        };
-      }),
-    });
-  }
+  const sections = r.sections ?? [];
   return {
-    nameEn: r.personal?.en?.name ?? def.nameEn,
-    nameZh: r.personal?.zh?.name ?? def.nameZh,
-    basicInfo,
-    sections: sections.length > 0 ? sections : def.sections,
+    nameEn: r.nameEn ?? r.personal?.en?.name ?? def.nameEn,
+    nameZh: r.nameZh ?? r.personal?.zh?.name ?? def.nameZh,
+    contentEn: sectionsToMarkdownEn(sections) || def.contentEn,
+    contentZh: sectionsToMarkdownZh(sections) || def.contentZh,
+    paperStyle: def.paperStyle,
   };
 }
 

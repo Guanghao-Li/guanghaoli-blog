@@ -12,6 +12,13 @@ export interface Project {
   descriptionZh: string;
   tags: string[];
   size: "large" | "medium";
+  colSpan?: number;
+  rowSpan?: number;
+  order?: number;
+  coverImage?: string;
+  readTime?: number;
+  createdAt?: string;
+  updatedAt?: string;
   /** 英文 Markdown 正文 */
   markdownEn: string;
   /** 中文 Markdown 正文 */
@@ -125,6 +132,10 @@ export const PROJECTS: Project[] = [
     descriptionZh: "基于 Next.js 与 IoT 的智能家居管理系统，支持多设备联动与场景编排。",
     tags: ["Next.js", "TypeScript", "IoT", "Framer Motion"],
     size: "large",
+    colSpan: 2,
+    rowSpan: 1,
+    order: 0,
+    readTime: 5,
     markdownEn: MD_SAMPLE_1_EN,
     markdownZh: MD_SAMPLE_1,
   },
@@ -136,6 +147,10 @@ export const PROJECTS: Project[] = [
     descriptionZh: "可复用的 UI 组件库，遵循 Apple HIG 设计规范。",
     tags: ["React", "Tailwind", "Storybook"],
     size: "medium",
+    colSpan: 1,
+    rowSpan: 1,
+    order: 1,
+    readTime: 4,
     markdownEn: MD_SAMPLE_2,
     markdownZh: MD_SAMPLE_2,
   },
@@ -147,6 +162,10 @@ export const PROJECTS: Project[] = [
     descriptionZh: "实时数据展示与图表分析，支持多数据源接入。",
     tags: ["Chart.js", "WebSocket", "Node.js"],
     size: "medium",
+    colSpan: 1,
+    rowSpan: 1,
+    order: 2,
+    readTime: 3,
     markdownEn: MD_SAMPLE_3,
     markdownZh: MD_SAMPLE_3,
   },

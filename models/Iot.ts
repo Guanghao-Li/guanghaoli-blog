@@ -1,12 +1,23 @@
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 
+const ChartConfigSchema = new mongoose.Schema(
+  {
+    chartType: { type: String, enum: ["line", "bar", "area"], default: "line" },
+    apiKey: { type: String, default: "" },
+    yAxisLabel: { type: String, default: "Value" },
+    metricKey: { type: String, default: "default" },
+  },
+  { _id: false }
+);
+
 const IotSchema = new mongoose.Schema(
   {
     title: { type: String, default: "" },
     titleZh: { type: String, default: "" },
     description: { type: String, default: "" },
     descriptionZh: { type: String, default: "" },
+    chartConfig: ChartConfigSchema,
   },
   { _id: true, timestamps: false }
 );
@@ -23,6 +34,12 @@ export async function upsertIot(data: {
   titleZh?: string;
   description?: string;
   descriptionZh?: string;
+  chartConfig?: {
+    chartType?: "line" | "bar" | "area";
+    apiKey?: string;
+    yAxisLabel?: string;
+    metricKey?: string;
+  };
 }) {
   await connectDB();
   const doc = await Iot.findOneAndUpdate(

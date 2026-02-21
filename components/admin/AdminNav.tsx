@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, FileText, FolderOpen, Settings, Cpu } from "lucide-react";
+import { User, FileText, FolderOpen, Settings, Cpu, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "基础设置 (Hero)", icon: User },
   { href: "/admin/resume", label: "简历管理 (Resume)", icon: FileText },
   { href: "/admin/projects", label: "项目管理 (Projects)", icon: FolderOpen },
+  { href: "/admin/dashboard", label: "Dashboard Widget", icon: LayoutGrid },
   { href: "/admin/iot", label: "仪表盘配置 (IoT)", icon: Cpu },
 ];
 

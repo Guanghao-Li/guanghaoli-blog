@@ -19,10 +19,17 @@ const ProjectSchema = new mongoose.Schema(
     descriptionZh: { type: String, default: "" },
     tags: [String],
     size: { type: String, enum: ["large", "medium"], default: "medium" },
+    colSpan: { type: Number, default: 1 },
+    rowSpan: { type: Number, default: 1 },
+    order: { type: Number, default: 0 },
+    coverImage: { type: String, default: "" },
+    readTime: { type: Number, default: 0 },
     markdownEn: { type: String, default: "" },
     markdownZh: { type: String, default: "" },
     markdown: { type: String, default: undefined },
     uiSettings: UiSettingsSchema,
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
   },
   { _id: true, timestamps: false }
 );
@@ -32,7 +39,7 @@ const Project =
 
 export async function getProjects() {
   await connectDB();
-  return Project.find().sort({ id: 1 }).lean();
+  return Project.find().sort({ order: 1, id: 1 }).lean();
 }
 
 export async function replaceProjects(projects: any[]) {
