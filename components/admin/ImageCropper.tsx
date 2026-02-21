@@ -12,18 +12,32 @@ function createImage(url: string): Promise<HTMLImageElement> {
   });
 }
 
+/** 输出最大边长，限制 Base64 体积以适配只读文件系统部署 */
+const AVATAR_MAX_SIZE = 512;
+const AVATAR_QUALITY = 0.85;
+
 async function getCroppedImg(
   imageSrc: string,
   pixelCrop: Area,
-  quality = 0.9
+  options: { maxSize?: number; quality?: number } = {}
 ): Promise<string> {
+  const maxSize = options.maxSize ?? AVATAR_MAX_SIZE;
+  const quality = options.quality ?? AVATAR_QUALITY;
+
   const image = await createImage(imageSrc);
+  let { width, height } = pixelCrop;
+  if (width > maxSize || height > maxSize) {
+    const ratio = Math.min(maxSize / width, maxSize / height);
+    width = Math.round(width * ratio);
+    height = Math.round(height * ratio);
+  }
+
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("No 2d context");
 
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  canvas.width = width;
+  canvas.height = height;
 
   ctx.drawImage(
     image,
@@ -33,8 +47,8 @@ async function getCroppedImg(
     pixelCrop.height,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height
+    width,
+    height
   );
 
   return canvas.toDataURL("image/jpeg", quality);

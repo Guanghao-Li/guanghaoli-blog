@@ -3,6 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import "md-editor-rt/lib/style.css";
+import { compressImagesToBase64 } from "@/lib/image-utils";
 
 const MdEditor = dynamic(() => import("md-editor-rt").then((mod) => mod.MdEditor), {
   ssr: false,
@@ -32,17 +33,17 @@ export default function ResumeMarkdownEditor({
     files: File[],
     callback: (urls: string[]) => void
   ) => {
-    const urls: string[] = [];
-    for (const file of files) {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const r = new FileReader();
-        r.onload = () => resolve(r.result as string);
-        r.onerror = reject;
-        r.readAsDataURL(file);
+    try {
+      const urls = await compressImagesToBase64(files, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        quality: 0.8,
       });
-      urls.push(dataUrl);
+      callback(urls);
+    } catch (e) {
+      console.error("Image upload failed:", e);
+      callback([]);
     }
-    callback(urls);
   };
 
   return (

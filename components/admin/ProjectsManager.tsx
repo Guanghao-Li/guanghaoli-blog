@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import CompressedImageInput from "./CompressedImageInput";
 
 const TITLE_SIZE_OPTIONS = [
   { value: "text-2xl md:text-3xl", label: "2xl / 3xl (默认)" },
@@ -119,13 +120,14 @@ export default function ProjectsManager() {
           {editing === p.id && (
             <div className="mt-4 space-y-3">
               <div className="grid gap-2 sm:grid-cols-2">
-                <div>
-                  <label className="block text-xs text-zinc-500">封面图 URL 或 Base64</label>
-                  <input
+                <div className="sm:col-span-2">
+                  <CompressedImageInput
                     value={p.coverImage ?? ""}
-                    onChange={(e) => updateProject(p.id, { coverImage: e.target.value })}
-                    placeholder="/cover.jpg 或 data:image/..."
-                    className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                    onChange={(v) => updateProject(p.id, { coverImage: v })}
+                    label="封面图"
+                    placeholder="选择图片或粘贴 URL/Base64"
+                    maxSize={1200}
+                    quality={0.8}
                   />
                 </div>
                 <div>
