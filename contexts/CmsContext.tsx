@@ -28,6 +28,8 @@ interface HeroData {
   emojiSize?: number;
   minAngle?: number;
   maxAngle?: number;
+  gravity?: number;
+  animationSpeed?: number;
 }
 
 export interface DashboardWidget {

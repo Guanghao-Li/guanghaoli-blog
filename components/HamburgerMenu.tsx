@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import Link from "next/link";
+import { Menu, X, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useProjectDetail } from "@/contexts/ProjectDetailContext";
@@ -91,6 +92,14 @@ export default function HamburgerMenu() {
               <p className="mt-4 text-sm text-[hsl(var(--text-muted))]">
                 {t("Portfolio · Navigation & Settings", "作品集 · 导航与设置")}
               </p>
+              <Link
+                href="/admin"
+                onClick={() => setIsOpen(false)}
+                className="mt-4 flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-[hsl(var(--text-muted))] hover:bg-[hsl(var(--accent-muted))] hover:text-[hsl(var(--text))]"
+              >
+                <Settings className="h-4 w-4 shrink-0" />
+                {t("Admin", "后台")}
+              </Link>
             </motion.div>
           </>
         )}

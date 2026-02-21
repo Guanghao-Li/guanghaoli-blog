@@ -1,16 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { motion } from "framer-motion";
 
 const EMOJIS = ["⚡️", "💡", "🚀", "💻", "🎯", "✨", "🔥", "🌟"];
 
 export interface EmojiParticle {
-  id: number;
+  id: string;
   emoji: string;
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
+  originX: number;
+  originY: number;
+  deltaX: number;
+  gravity: number;
+  duration: number;
+}
+
+function randDeltaX() {
+  return (Math.random() - 0.5) * 400;
 }
 
 export default function PhysicsEmoji({
@@ -19,106 +25,94 @@ export default function PhysicsEmoji({
   emojiSize = 28,
 }: {
   particles: EmojiParticle[];
-  onRemove: (id: number) => void;
+  onRemove: (id: string) => void;
   emojiSize?: number;
 }) {
-  const stateRef = useRef<Map<number, EmojiParticle>>(new Map());
-  const g = 0.6;
-
-  useEffect(() => {
-    particles.forEach((p) => stateRef.current.set(p.id, { ...p }));
-  }, [particles]);
-
-  const [positions, setPositions] = useState<Map<number, { x: number; y: number }>>(new Map());
-
-  useEffect(() => {
-    if (particles.length === 0) return;
-
-    const run = () => {
-      const next = new Map<number, { x: number; y: number }>();
-      const toRemove: number[] = [];
-      const viewH = window.innerHeight;
-
-      stateRef.current.forEach((p, id) => {
-        const vy = p.vy + g;
-        const x = p.x + p.vx;
-        const y = p.y + vy;
-        p.x = x;
-        p.y = y;
-        p.vx = p.vx;
-        p.vy = vy;
-        next.set(id, { x, y });
-        if (y > viewH + 80) toRemove.push(id);
-      });
-
-      toRemove.forEach((id) => {
-        stateRef.current.delete(id);
-        onRemove(id);
-      });
-
-      setPositions(new Map(next));
-    };
-
-    let raf: number;
-    const loop = () => {
-      run();
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
-  }, [particles.length, onRemove]);
-
   return (
     <>
-      {particles.map((p) => {
-        const pos = positions.get(p.id) ?? { x: p.x, y: p.y };
-        return (
-          <span
-            key={p.id}
-            className="fixed pointer-events-none z-[60] select-none"
-            style={{
-              left: pos.x,
-              top: pos.y,
-              fontSize: `${emojiSize}px`,
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            {p.emoji}
-          </span>
-        );
-      })}
+      {particles.map((p) => (
+        <Particle
+          key={p.id}
+          particle={p}
+          emojiSize={emojiSize}
+          onComplete={() => onRemove(p.id)}
+        />
+      ))}
     </>
+  );
+}
+
+function Particle({
+  particle,
+  emojiSize,
+  onComplete,
+}: {
+  particle: EmojiParticle;
+  emojiSize: number;
+  onComplete: () => void;
+}) {
+  const { id, emoji, originX, originY, deltaX, gravity, duration } = particle;
+
+  return (
+    <motion.span
+      className="fixed pointer-events-none z-[60] select-none"
+      style={{
+        left: originX,
+        top: originY,
+        fontSize: `${emojiSize}px`,
+        transform: "translate(-50%, -50%)",
+      }}
+      initial={{ x: 0, y: 0 }}
+      animate={{
+        x: deltaX,
+        y: [0, -150, gravity],
+      }}
+      transition={{
+        duration,
+        ease: ["easeOut", "easeOut", "easeIn"],
+        times: [0, 0.2, 1],
+      }}
+      onAnimationComplete={onComplete}
+    >
+      {emoji}
+    </motion.span>
   );
 }
 
 export function usePhysicsEmojis(
   emojiSize: number,
   minAngle: number,
-  maxAngle: number
+  maxAngle: number,
+  gravity = 1000,
+  animationSpeed = 2
 ) {
   const [particles, setParticles] = useState<EmojiParticle[]>([]);
-  const idRef = useRef(0);
 
   const spawn = useCallback(
     (originX: number, originY: number) => {
-      const angleDeg = minAngle + Math.random() * (maxAngle - minAngle);
-      const angleRad = (angleDeg * Math.PI) / 180;
-      const speed = 8 + Math.random() * 6;
-      const vx = Math.cos(angleRad) * speed * (Math.random() > 0.5 ? 1 : -1);
-      const vy = -Math.sin(angleRad) * speed;
-
-      const id = ++idRef.current;
-      const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-      setParticles((prev) => [
-        ...prev,
-        { id, emoji, x: originX, y: originY, vx, vy },
-      ]);
+      const count = 1 + Math.floor(Math.random() * 4);
+      const newParticles: EmojiParticle[] = [];
+      for (let i = 0; i < count; i++) {
+        const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const emoji = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+        const deltaX = randDeltaX();
+        newParticles.push({
+          id,
+          emoji,
+          originX,
+          originY,
+          deltaX,
+          gravity,
+          duration: animationSpeed,
+        });
+      }
+      setParticles((prev) => [...prev, ...newParticles]);
     },
-    [minAngle, maxAngle]
+    [gravity, animationSpeed]
   );
 
-  const remove = useCallback((id: number) => {
-    setParticles((prev) => prev.filter((e) => e.id !== id));
+  const remove = useCallback((id: string) => {
+    setParticles((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
   return { particles, spawn, remove };

@@ -58,9 +58,15 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const { lang, t } = useLanguage();
   const hero = useCmsHero();
   const emojiSize = hero?.emojiSize ?? 28;
-  const minAngle = hero?.minAngle ?? 45;
-  const maxAngle = hero?.maxAngle ?? 135;
-  const { particles, spawn, remove } = usePhysicsEmojis(emojiSize, minAngle, maxAngle);
+  const gravity = hero?.gravity ?? 1000;
+  const animationSpeed = hero?.animationSpeed ?? 2;
+  const { particles, spawn, remove } = usePhysicsEmojis(
+    emojiSize,
+    45,
+    135,
+    gravity,
+    animationSpeed
+  );
 
   useEffect(() => {
     scrollContainerRef.current = document.querySelector(".scroll-snap-container");

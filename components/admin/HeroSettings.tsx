@@ -20,6 +20,8 @@ export default function HeroSettings() {
   const [emojiSize, setEmojiSize] = useState(28);
   const [minAngle, setMinAngle] = useState(45);
   const [maxAngle, setMaxAngle] = useState(135);
+  const [gravity, setGravity] = useState(1000);
+  const [animationSpeed, setAnimationSpeed] = useState(2);
   const [infoPositionX, setInfoPositionX] = useState(0);
   const [infoPositionY, setInfoPositionY] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -48,6 +50,8 @@ export default function HeroSettings() {
         setEmojiSize(h.emojiSize ?? 28);
         setMinAngle(h.minAngle ?? 45);
         setMaxAngle(h.maxAngle ?? 135);
+        setGravity(h.gravity ?? 1000);
+        setAnimationSpeed(h.animationSpeed ?? 2);
         setInfoPositionX(h.infoPositionX ?? 0);
         setInfoPositionY(h.infoPositionY ?? 0);
         setDirty(false);
@@ -78,6 +82,8 @@ export default function HeroSettings() {
         emojiSize,
         minAngle,
         maxAngle,
+        gravity,
+        animationSpeed,
       };
       await fetch("/api/admin/cms", {
         method: "PUT",
@@ -276,6 +282,30 @@ export default function HeroSettings() {
               step={5}
               value={maxAngle}
               onChange={(e) => { setMaxAngle(Number(e.target.value)); setDirty(true); }}
+              className="w-full h-2 rounded-lg accent-zinc-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">重力/下落深度 (px) {gravity}</label>
+            <input
+              type="range"
+              min={800}
+              max={1500}
+              step={50}
+              value={gravity}
+              onChange={(e) => { setGravity(Number(e.target.value)); setDirty(true); }}
+              className="w-full h-2 rounded-lg accent-zinc-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">动画时长 (s) {animationSpeed}</label>
+            <input
+              type="range"
+              min={1.5}
+              max={3}
+              step={0.1}
+              value={animationSpeed}
+              onChange={(e) => { setAnimationSpeed(Number(e.target.value)); setDirty(true); }}
               className="w-full h-2 rounded-lg accent-zinc-700"
             />
           </div>
