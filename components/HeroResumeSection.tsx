@@ -98,16 +98,17 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
   const hasContact = !!(phone || email || address);
 
   return (
-    <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden -translate-y-20 md:-translate-y-24">
+    <section className="relative flex min-h-screen w-full items-center justify-center -translate-y-20 md:-translate-y-24">
       <PhysicsEmoji particles={particles} emojiSize={emojiSize} />
       <div ref={containerRef} className="absolute inset-0" aria-hidden />
       {!isResumeActive && (
         <motion.div
-          style={{ y, opacity, filter: blurFilter }}
+          style={{ y }}
           className="absolute inset-0 flex flex-col items-center justify-center px-6 mb-8"
         >
           <div className="flex-shrink-0 w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 relative flex items-center justify-center">
             <motion.div
+              style={{ opacity, filter: blurFilter }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8 }}
@@ -118,11 +119,8 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
           </div>
           <SharedName layoutId="hero-name" isResume={false} lang={lang} />
           <motion.p
-            layout
+            style={{ opacity, filter: blurFilter }}
             className="mt-3 text-center text-sm font-medium tracking-widest text-zinc-500 dark:text-zinc-400 md:text-base whitespace-nowrap"
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.2 }}
           >
             {(lang === "zh" ? hero?.subtitleZh : hero?.subtitle) || t(
               "Embedded Systems Engineer",
@@ -135,10 +133,11 @@ function HeroContent({ isResumeActive }: { isResumeActive: boolean }) {
               className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-zinc-500 dark:text-zinc-400"
               style={{
                 fontSize: `${fontSize}px`,
-                transform: `translate(${posX}px, ${posY}px)`,
+                paddingLeft: `${posX}px`,
+                paddingTop: `${posY}px`,
               }}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               {phone && (
@@ -219,7 +218,8 @@ function ResumeContent({ isResumeActive }: { isResumeActive: boolean }) {
                   className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[hsl(var(--text-muted))]"
                   style={{
                     fontSize: `${resumeFontSize}px`,
-                    transform: `translate(${resumePosX}px, ${resumePosY}px)`,
+                    paddingLeft: `${resumePosX}px`,
+                    paddingTop: `${resumePosY}px`,
                   }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

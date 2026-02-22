@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { List, X } from "lucide-react";
+import { BookOpen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TocEntry } from "@/lib/toc-utils";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -115,22 +115,24 @@ export default function TableOfContents({
   /* ─── Mobile: FAB + Bottom Sheet ─── */
   return (
     <>
-      {/* FAB — pixel-matched with hamburger/dock button aesthetic */}
-      <button
+      {/* FAB — accent-tinted, visually distinct from hamburger menu */}
+      <motion.button
         type="button"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 400, damping: 22, delay: 0.4 }}
         onClick={() => setSheetOpen(true)}
         className={cn(
           "fixed bottom-8 right-8 z-40 xl:hidden",
           "flex h-12 w-12 items-center justify-center rounded-full",
-          "border border-[hsl(var(--border))]",
-          "bg-[hsl(var(--surface))]/80 dark:bg-[hsl(var(--surface-dark-elevated))]/90",
-          "shadow-lg backdrop-blur-xl",
+          "bg-[hsl(var(--accent))]/90 text-white",
+          "shadow-lg shadow-[hsl(var(--accent))]/25 backdrop-blur-xl",
           "transition-all hover:scale-105 active:scale-95 active:opacity-70"
         )}
         aria-label={t("Open table of contents", "打开目录")}
       >
-        <List className="h-5 w-5" strokeWidth={2} />
-      </button>
+        <BookOpen className="h-5 w-5" strokeWidth={2} />
+      </motion.button>
 
       {/* Bottom Sheet */}
       <AnimatePresence>
