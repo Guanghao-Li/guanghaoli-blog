@@ -9,8 +9,10 @@ import ProjectDetailBackButton from "@/components/ProjectDetailBackButton";
 export default function SiteChrome() {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const isDetailPage =
+    pathname?.startsWith("/project/") || pathname?.startsWith("/blog/");
 
-  if (isAdmin) return null;
+  if (isAdmin || isDetailPage) return null;
 
   return (
     <>

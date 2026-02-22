@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ChevronLeft } from "lucide-react";
+import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import MarkdownContentWithIds from "@/components/MarkdownContentWithIds";
 import TableOfContents from "@/components/TableOfContents";
+import ThemeToggle from "@/components/ThemeToggle";
 import PdfAttachment from "@/components/PdfAttachment";
 import { extractToc } from "@/lib/toc-utils";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
 
 function formatDate(iso?: string, lang: "en" | "zh" = "en") {
   if (!iso) return "";
@@ -19,11 +21,19 @@ function formatDate(iso?: string, lang: "en" | "zh" = "en") {
     : d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 }
 
+const backBtnClass = cn(
+  "flex h-12 w-12 items-center justify-center rounded-full",
+  "border border-[hsl(var(--border))]",
+  "bg-[hsl(var(--surface))]/80 dark:bg-[hsl(var(--surface-dark-elevated))]/90",
+  "shadow-lg backdrop-blur-xl",
+  "transition-transform hover:scale-105 active:scale-95"
+);
+
 export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const id = params?.id as string;
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const [project, setProject] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,92 +50,178 @@ export default function ProjectDetailPage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center">加载中...</div>;
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--surface))]">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[hsl(var(--accent))]/30 border-t-[hsl(var(--accent))]" />
+      </div>
+    );
+  }
+
   if (error || !project) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-        <p className="text-[hsl(var(--text-muted))]">{error || "Project not found"}</p>
-        <Link href="/#projects" className="text-[hsl(var(--accent))] hover:underline">
-          返回首页
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[hsl(var(--surface))] px-4">
+        <p className="text-lg text-[hsl(var(--text-muted))]">{error || "Project not found"}</p>
+        <Link
+          href="/#projects"
+          className="rounded-full bg-[hsl(var(--accent-muted))] px-6 py-2.5 text-sm font-medium text-[hsl(var(--accent))] transition-colors hover:bg-[hsl(var(--accent))]/20"
+        >
+          {t("Back to Home", "返回首页")}
         </Link>
       </div>
     );
   }
 
-  const title = (lang === "zh" ? project.titleZh : project.title) || (lang === "zh" ? project.title : project.titleZh);
-  const content = lang === "zh"
-    ? (project.markdownZh ?? project.markdown ?? "")
-    : (project.markdownEn ?? project.markdown ?? "");
+  const title =
+    (lang === "zh" ? project.titleZh : project.title) ||
+    (lang === "zh" ? project.title : project.titleZh);
+  const content =
+    lang === "zh"
+      ? (project.markdownZh ?? project.markdown ?? "")
+      : (project.markdownEn ?? project.markdown ?? "");
   const toc = extractToc(content);
   const coverImage = project.coverImage;
   const isDataUrl = coverImage?.startsWith("data:");
 
   return (
     <div className="min-h-screen bg-[hsl(var(--surface))]">
-      {/* 顶部导航 - 最高层级，绝对隔离 */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]/90 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-4">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="flex items-center gap-1 text-sm text-[hsl(var(--text-muted))] hover:text-[hsl(var(--text))] transition-colors"
-          >
-            <ChevronLeft className="h-5 w-5" />
-            返回
-          </button>
-        </div>
-      </header>
+      {/* ══════ Mobile floating nav — exact hamburger-menu coordinates ══════ */}
+      <div className="pointer-events-none fixed left-0 right-0 top-0 z-30 h-24 bg-gradient-to-b from-[hsl(var(--surface))] via-[hsl(var(--surface))]/80 to-transparent lg:hidden" />
+      <button
+        onClick={() => router.back()}
+        className={cn(backBtnClass, "fixed left-4 top-4 z-[100] lg:hidden")}
+        aria-label={t("Back", "返回")}
+      >
+        <ArrowLeft className="h-5 w-5" strokeWidth={2} />
+      </button>
+      <div className="fixed right-4 top-4 z-[90]">
+        <ThemeToggle />
+      </div>
 
-      {/* 主容器 - 沉浸式阅读，居中 */}
-      <main className="mx-auto max-w-3xl px-4 pt-20 pb-16">
-        {coverImage && (
-          <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-2xl">
-            {isDataUrl ? (
-              <img src={coverImage} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <Image src={coverImage} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
+      {/* ══════ Three-Column Gemini Grid ══════ */}
+      <div className="mx-auto flex w-full max-w-[90rem] justify-center gap-10 px-4 pb-16 pt-20 lg:px-8 lg:pt-8">
+        {/* ── Left Sidebar ── */}
+        <aside className="sticky top-8 hidden h-fit w-64 shrink-0 lg:block">
+          <button
+            onClick={() => router.back()}
+            className={backBtnClass}
+            aria-label={t("Back", "返回")}
+          >
+            <ArrowLeft className="h-5 w-5" strokeWidth={2} />
+          </button>
+
+          <div className="mt-8 space-y-5">
+            {project.createdAt && (
+              <div className="flex items-center gap-2.5 text-sm text-[hsl(var(--text-muted))]">
+                <Calendar className="h-4 w-4 shrink-0 opacity-60" />
+                <span>{formatDate(project.createdAt, lang)}</span>
+              </div>
+            )}
+            {(project.readTime ?? 0) > 0 && (
+              <div className="flex items-center gap-2.5 text-sm text-[hsl(var(--text-muted))]">
+                <Clock className="h-4 w-4 shrink-0 opacity-60" />
+                <span>
+                  {lang === "zh"
+                    ? `${project.readTime} 分钟`
+                    : `${project.readTime} min read`}
+                </span>
+              </div>
+            )}
+            {project.tags?.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {project.tags.map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="rounded-full bg-[hsl(var(--accent-muted))] px-3 py-1 text-xs font-medium text-[hsl(var(--text-muted))]"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
-        )}
+        </aside>
 
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[hsl(var(--text-muted))]">
-          {(project.readTime ?? 0) > 0 && (
-            <span>{lang === "zh" ? `${project.readTime} 分钟阅读` : `${project.readTime} min read`}</span>
+        {/* ── Center Content ── */}
+        <main className="min-w-0 max-w-3xl flex-1">
+          {coverImage && (
+            <div className="relative mb-10 aspect-video w-full overflow-hidden rounded-2xl shadow-md">
+              {isDataUrl ? (
+                <img
+                  src={coverImage}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <Image
+                  src={coverImage}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 768px"
+                />
+              )}
+            </div>
           )}
-          {project.createdAt && (
-            <>
-              {(project.readTime ?? 0) > 0 && <span>·</span>}
-              <span>{formatDate(project.createdAt, lang)}</span>
-            </>
-          )}
-        </div>
-        {project.tags?.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {project.tags.map((tag: string) => (
-              <span
-                key={tag}
-                className="rounded-md bg-[hsl(var(--accent-muted))] px-3 py-1 text-sm font-medium"
-              >
-                {tag}
+
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-[2.5rem] lg:leading-tight">
+            {title}
+          </h1>
+
+          {/* Mobile-only metadata */}
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-[hsl(var(--text-muted))] lg:hidden">
+            {(project.readTime ?? 0) > 0 && (
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                {lang === "zh"
+                  ? `${project.readTime} 分钟`
+                  : `${project.readTime} min`}
               </span>
-            ))}
+            )}
+            {project.createdAt && (
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" />
+                {formatDate(project.createdAt, lang)}
+              </span>
+            )}
           </div>
-        )}
+          {project.tags?.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5 lg:hidden">
+              {project.tags.map((tag: string) => (
+                <span
+                  key={tag}
+                  className="rounded-full bg-[hsl(var(--accent-muted))] px-3 py-1 text-xs font-medium text-[hsl(var(--text-muted))]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
 
-        <article className="mt-8 [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
-          <MarkdownContentWithIds content={content} />
-        </article>
+          <div className="my-8 h-px bg-gradient-to-r from-transparent via-[hsl(var(--border))] to-transparent" />
 
-        {project.pdfData && (
-          <div className="mt-12">
-            <PdfAttachment pdfData={project.pdfData} pdfName={project.pdfName || "document.pdf"} />
-          </div>
-        )}
-      </main>
+          <article>
+            <MarkdownContentWithIds content={content} />
+          </article>
 
-      {/* TOC - 独立挂载，不干扰布局 */}
-      <TableOfContents toc={toc} />
+          {project.pdfData && (
+            <div className="mt-12">
+              <PdfAttachment
+                pdfData={project.pdfData}
+                pdfName={project.pdfName || "document.pdf"}
+              />
+            </div>
+          )}
+        </main>
+
+        {/* ── Right Sidebar: TOC ── */}
+        <aside className="sticky top-8 hidden h-fit max-h-[calc(100vh-4rem)] w-64 shrink-0 overflow-y-auto xl:block">
+          <TableOfContents toc={toc} mode="desktop" />
+        </aside>
+      </div>
+
+      {/* Mobile TOC FAB + Bottom Sheet */}
+      <TableOfContents toc={toc} mode="mobile" />
     </div>
   );
 }

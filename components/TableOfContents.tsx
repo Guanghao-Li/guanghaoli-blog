@@ -1,139 +1,200 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { List } from "lucide-react";
+import { List, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TocEntry } from "@/lib/toc-utils";
+import { useLanguage } from "@/contexts/LanguageContext";
+
+function TocItem({
+  entry,
+  isActive,
+  onClick,
+}: {
+  entry: TocEntry;
+  isActive: boolean;
+  onClick: () => void;
+}) {
+  const isH2 = entry.level === 2;
+
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "group flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left",
+        "transition-all duration-300 ease-out",
+        isH2 ? "text-[13px] font-medium" : "ml-3 text-xs",
+        isActive
+          ? "bg-[hsl(var(--accent))]/10 text-[hsl(var(--accent))]"
+          : "text-[hsl(var(--text-muted))] hover:bg-[hsl(var(--accent-muted))]/50 hover:text-[hsl(var(--text))]"
+      )}
+    >
+      <span
+        className={cn(
+          "shrink-0 rounded-full transition-all duration-300",
+          isH2 ? "h-1.5 w-1.5" : "h-1 w-1",
+          isActive
+            ? "bg-[hsl(var(--accent))] shadow-[0_0_6px_hsl(var(--accent))]"
+            : "bg-[hsl(var(--text-muted))]/25 group-hover:bg-[hsl(var(--text-muted))]/50"
+        )}
+      />
+      <span className="line-clamp-2 leading-snug">{entry.text}</span>
+    </button>
+  );
+}
 
 interface TableOfContentsProps {
   toc: TocEntry[];
+  /** "desktop" = inline list only; "mobile" = FAB + sheet only */
+  mode?: "desktop" | "mobile";
 }
 
-export default function TableOfContents({ toc }: TableOfContentsProps) {
+export default function TableOfContents({
+  toc,
+  mode = "mobile",
+}: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string | null>(toc[0]?.id ?? null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (toc.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setActiveId(e.target.id);
-            break;
-          }
-        }
-      },
-      { rootMargin: "-100px 0px -60% 0px", threshold: 0 }
-    );
-
+    const headingEls: Element[] = [];
     toc.forEach(({ id }) => {
       const el = document.getElementById(id);
-      if (el) observer.observe(el);
+      if (el) headingEls.push(el);
     });
+    if (headingEls.length === 0) return;
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.find((e) => e.isIntersecting);
+        if (hit) setActiveId(hit.target.id);
+      },
+      { rootMargin: "-80px 0px -65% 0px", threshold: 0 }
+    );
+
+    headingEls.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [toc]);
 
-  const scrollToId = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    setSheetOpen(false);
-  };
-
-  const tocNav = (
-    <nav className="space-y-1.5" aria-label="目录">
-      {toc.map((e) => {
-        const isH2 = e.level === 2;
-        const isActive = activeId === e.id;
-        return (
-          <a
-            key={e.id}
-            href={`#${e.id}`}
-            onClick={(ev) => {
-              ev.preventDefault();
-              scrollToId(e.id);
-            }}
-            className={cn(
-              "flex items-start gap-2 rounded-md py-0.5 pr-2 transition-colors duration-200",
-              "hover:text-[hsl(var(--text))]",
-              isH2 && "text-sm font-medium",
-              !isH2 && "pl-4 text-xs text-[hsl(var(--text-muted))]",
-              isActive && "text-[hsl(var(--accent))]"
-            )}
-          >
-            <span
-              className={cn(
-                "mt-1.5 shrink-0 rounded-full border-2 transition-colors duration-200",
-                isH2 ? "h-2 w-2" : "ml-1 h-1.5 w-1.5",
-                isActive
-                  ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent))]"
-                  : "border-gray-200 bg-transparent dark:border-gray-700"
-              )}
-              aria-hidden
-            />
-            <span className="line-clamp-2">{e.text}</span>
-          </a>
-        );
-      })}
-    </nav>
+  const scrollToId = useCallback(
+    (id: string) => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setSheetOpen(false);
+    },
+    []
   );
 
   if (toc.length === 0) return null;
 
+  /* ─── Desktop: inline list (rendered inside parent sticky aside) ─── */
+  if (mode === "desktop") {
+    return (
+      <>
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-[hsl(var(--text-muted))]/70">
+          {t("On This Page", "本页导读")}
+        </p>
+        <nav className="flex flex-col gap-0.5" aria-label="Table of contents">
+          {toc.map((entry) => (
+            <TocItem
+              key={entry.id}
+              entry={entry}
+              isActive={activeId === entry.id}
+              onClick={() => scrollToId(entry.id)}
+            />
+          ))}
+        </nav>
+      </>
+    );
+  }
+
+  /* ─── Mobile: FAB + Bottom Sheet ─── */
   return (
     <>
-      {/* 桌面端：右侧悬浮时间轴 - 正文右侧外围 */}
-      <aside
-        className="hidden lg:block fixed top-32 right-8 z-30 w-44 max-h-[60vh] overflow-y-auto"
+      {/* FAB — pixel-matched with hamburger/dock button aesthetic */}
+      <button
+        type="button"
+        onClick={() => setSheetOpen(true)}
+        className={cn(
+          "fixed bottom-8 right-8 z-40 xl:hidden",
+          "flex h-12 w-12 items-center justify-center rounded-full",
+          "border border-[hsl(var(--border))]",
+          "bg-[hsl(var(--surface))]/80 dark:bg-[hsl(var(--surface-dark-elevated))]/90",
+          "shadow-lg backdrop-blur-xl",
+          "transition-transform hover:scale-105 active:scale-95"
+        )}
+        aria-label={t("Open table of contents", "打开目录")}
       >
-        <div className="border-l border-gray-200/80 dark:border-gray-800 pl-3">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-[hsl(var(--text-muted))]">
-            目录
-          </p>
-          {tocNav}
-        </div>
-      </aside>
+        <List className="h-5 w-5" strokeWidth={2} />
+      </button>
 
-      {/* 移动端：FAB */}
-      <div className="fixed bottom-8 right-8 z-40 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setSheetOpen(true)}
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--surface))]/90 shadow-lg backdrop-blur-xl"
-          aria-label="打开目录"
-        >
-          <List className="h-6 w-6" strokeWidth={2} />
-        </button>
-      </div>
-
-      {/* 移动端：Bottom Sheet */}
+      {/* Bottom Sheet */}
       <AnimatePresence>
         {sheetOpen && (
           <>
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm"
               onClick={() => setSheetOpen(false)}
-              aria-hidden
             />
+            {/* Sheet */}
             <motion.div
               initial={{ y: "100%" }}
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed bottom-0 left-0 right-0 z-40 max-h-[70vh] overflow-y-auto rounded-t-2xl border-t border-[hsl(var(--border))] bg-[hsl(var(--surface))] p-5 pb-safe lg:hidden"
+              transition={{
+                type: "spring",
+                damping: 28,
+                stiffness: 350,
+                mass: 0.8,
+              }}
+              className={cn(
+                "fixed bottom-0 left-0 right-0 z-[100]",
+                "max-h-[75vh] overflow-y-auto overscroll-contain",
+                "rounded-t-[2rem]",
+                "bg-[hsl(var(--surface))] dark:bg-[hsl(var(--surface-dark-elevated))]",
+                "shadow-[0_-8px_32px_rgba(0,0,0,0.12)]"
+              )}
             >
-              <p className="mb-4 text-sm font-semibold">目录</p>
-              <div className="border-l border-gray-200/80 dark:border-gray-800 pl-4">
-                {tocNav}
+              {/* Handle bar */}
+              <div className="sticky top-0 z-10 flex justify-center bg-inherit pb-2 pt-3">
+                <div className="h-1 w-10 rounded-full bg-[hsl(var(--text-muted))]/20" />
               </div>
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 pb-3">
+                <p className="text-sm font-semibold">
+                  {t("On This Page", "本页导读")}
+                </p>
+                <button
+                  onClick={() => setSheetOpen(false)}
+                  className="rounded-full p-2 transition-colors hover:bg-[hsl(var(--accent-muted))]/50"
+                  aria-label={t("Close", "关闭")}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              {/* Items */}
+              <nav
+                className="flex flex-col gap-0.5 px-4 pb-8"
+                aria-label="Table of contents"
+              >
+                {toc.map((entry) => (
+                  <TocItem
+                    key={entry.id}
+                    entry={entry}
+                    isActive={activeId === entry.id}
+                    onClick={() => scrollToId(entry.id)}
+                  />
+                ))}
+              </nav>
             </motion.div>
           </>
         )}

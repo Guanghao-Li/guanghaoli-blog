@@ -71,7 +71,7 @@ export default function MarkdownContentWithIds({ content }: { content: string })
   );
 
   return (
-    <div className="prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-mt-24 [&_pre]:!rounded-xl [&_pre]:!p-4 [&_pre]:!bg-zinc-800 [&_pre]:!text-zinc-100">
+    <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:scroll-mt-24 prose-img:rounded-2xl prose-img:shadow-md [&_pre]:!rounded-xl [&_pre]:!p-4 [&_pre]:!bg-zinc-800 [&_pre]:!text-zinc-100">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
