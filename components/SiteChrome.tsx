@@ -12,7 +12,18 @@ export default function SiteChrome() {
   const isDetailPage =
     pathname?.startsWith("/project/") || pathname?.startsWith("/blog/");
 
-  if (isAdmin || isDetailPage) return null;
+  if (isAdmin) return null;
+
+  if (isDetailPage) {
+    return (
+      <div className="hidden lg:contents">
+        <HamburgerMenu />
+        <header className="fixed right-4 top-4 z-[90]">
+          <ThemeToggle />
+        </header>
+      </div>
+    );
+  }
 
   return (
     <>

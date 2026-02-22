@@ -7,7 +7,7 @@ import Image from "next/image";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import MarkdownContentWithIds from "@/components/MarkdownContentWithIds";
 import TableOfContents from "@/components/TableOfContents";
-import ThemeToggle from "@/components/ThemeToggle";
+import DetailMobileNav from "@/components/DetailMobileNav";
 import PdfAttachment from "@/components/PdfAttachment";
 import { extractToc } from "@/lib/toc-utils";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -17,8 +17,16 @@ function formatDate(iso?: string, lang: "en" | "zh" = "en") {
   if (!iso) return "";
   const d = new Date(iso);
   return lang === "zh"
-    ? d.toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric" })
-    : d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    ? d.toLocaleDateString("zh-CN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : d.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
 }
 
 const backBtnClass = cn(
@@ -26,7 +34,7 @@ const backBtnClass = cn(
   "border border-[hsl(var(--border))]",
   "bg-[hsl(var(--surface))]/80 dark:bg-[hsl(var(--surface-dark-elevated))]/90",
   "shadow-lg backdrop-blur-xl",
-  "transition-transform hover:scale-105 active:scale-95"
+  "transition-all hover:scale-105 active:scale-95 active:opacity-70"
 );
 
 export default function ProjectDetailPage() {
@@ -61,7 +69,9 @@ export default function ProjectDetailPage() {
   if (error || !project) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[hsl(var(--surface))] px-4">
-        <p className="text-lg text-[hsl(var(--text-muted))]">{error || "Project not found"}</p>
+        <p className="text-lg text-[hsl(var(--text-muted))]">
+          {error || "Project not found"}
+        </p>
         <Link
           href="/#projects"
           className="rounded-full bg-[hsl(var(--accent-muted))] px-6 py-2.5 text-sm font-medium text-[hsl(var(--accent))] transition-colors hover:bg-[hsl(var(--accent))]/20"
@@ -85,22 +95,12 @@ export default function ProjectDetailPage() {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--surface))]">
-      {/* ══════ Mobile floating nav — exact hamburger-menu coordinates ══════ */}
-      <div className="pointer-events-none fixed left-0 right-0 top-0 z-30 h-24 bg-gradient-to-b from-[hsl(var(--surface))] via-[hsl(var(--surface))]/80 to-transparent lg:hidden" />
-      <button
-        onClick={() => router.back()}
-        className={cn(backBtnClass, "fixed left-4 top-4 z-[100] lg:hidden")}
-        aria-label={t("Back", "返回")}
-      >
-        <ArrowLeft className="h-5 w-5" strokeWidth={2} />
-      </button>
-      <div className="fixed right-4 top-4 z-[90]">
-        <ThemeToggle />
-      </div>
+      {/* Mobile unified topbar */}
+      <DetailMobileNav title={title} />
 
-      {/* ══════ Three-Column Gemini Grid ══════ */}
-      <div className="mx-auto flex w-full max-w-[90rem] justify-center gap-10 px-4 pb-16 pt-20 lg:px-8 lg:pt-8">
-        {/* ── Left Sidebar ── */}
+      {/* Three-Column Gemini Grid */}
+      <div className="mx-auto flex w-full max-w-[90rem] justify-center gap-10 px-4 pb-16 pt-16 lg:px-8 lg:pt-8">
+        {/* Left Sidebar — desktop only */}
         <aside className="sticky top-8 hidden h-fit w-64 shrink-0 lg:block">
           <button
             onClick={() => router.back()}
@@ -142,7 +142,7 @@ export default function ProjectDetailPage() {
           </div>
         </aside>
 
-        {/* ── Center Content ── */}
+        {/* Center Content */}
         <main className="min-w-0 max-w-3xl flex-1">
           {coverImage && (
             <div className="relative mb-10 aspect-video w-full overflow-hidden rounded-2xl shadow-md">
@@ -214,7 +214,7 @@ export default function ProjectDetailPage() {
           )}
         </main>
 
-        {/* ── Right Sidebar: TOC ── */}
+        {/* Right Sidebar — TOC desktop */}
         <aside className="sticky top-8 hidden h-fit max-h-[calc(100vh-4rem)] w-64 shrink-0 overflow-y-auto xl:block">
           <TableOfContents toc={toc} mode="desktop" />
         </aside>

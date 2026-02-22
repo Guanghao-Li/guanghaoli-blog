@@ -125,7 +125,7 @@ export default function TableOfContents({
           "border border-[hsl(var(--border))]",
           "bg-[hsl(var(--surface))]/80 dark:bg-[hsl(var(--surface-dark-elevated))]/90",
           "shadow-lg backdrop-blur-xl",
-          "transition-transform hover:scale-105 active:scale-95"
+          "transition-all hover:scale-105 active:scale-95 active:opacity-70"
         )}
         aria-label={t("Open table of contents", "打开目录")}
       >

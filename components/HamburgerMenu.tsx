@@ -24,7 +24,7 @@ export default function HamburgerMenu() {
           "fixed left-4 top-4 z-[100] flex h-12 w-12 items-center justify-center rounded-full",
           "border border-[hsl(var(--border))]",
           "bg-[hsl(var(--surface))]/80 dark:bg-[hsl(var(--surface-dark-elevated))]/90",
-          "shadow-lg transition-transform hover:scale-105 active:scale-95"
+          "shadow-lg transition-all hover:scale-105 active:scale-95 active:opacity-70"
         )}
         aria-label={t("Open menu", "打开菜单")}
       >
@@ -41,20 +41,20 @@ export default function HamburgerMenu() {
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -12 }}
               animate={{
                 opacity: 1,
                 x: isSecondaryPage ? 80 : 0,
               }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ type: "spring", stiffness: 420, damping: 32 }}
               className="fixed left-4 top-4 z-[100] w-72 overflow-visible rounded-3xl border border-[hsl(var(--border))] bg-[hsl(var(--surface))] p-6 shadow-2xl dark:bg-[hsl(var(--surface-dark-elevated))]"
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">{t("Menu", "菜单")}</h3>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="rounded-full p-2 hover:bg-[hsl(var(--accent-muted))]"
+                  className="rounded-full p-2 hover:bg-[hsl(var(--accent-muted))] active:scale-95 active:opacity-70 transition-all"
                   aria-label={t("Close", "关闭")}
                 >
                   <X className="h-5 w-5" />

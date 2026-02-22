@@ -20,10 +20,10 @@ export default function Dock() {
 
   return (
     <motion.nav
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
           className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
           role="navigation"
         >
@@ -44,7 +44,7 @@ export default function Dock() {
               className={cn(
                 "flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200",
                 "hover:scale-110 hover:bg-[hsl(var(--accent-muted))]",
-                "active:scale-95"
+                "active:scale-95 active:opacity-70"
               )}
               aria-label={item.label}
             >

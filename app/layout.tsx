@@ -39,7 +39,7 @@ export default function RootLayout({
             <CmsProvider>
               <ScrollSectionProvider>
                 <ProjectDetailProvider>
-                <div className="relative min-h-full w-full">
+                <div className="relative min-h-full w-full overflow-x-hidden">
                   <SiteChrome />
                   {children}
                 </div>
