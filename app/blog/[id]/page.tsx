@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ChevronLeft } from "lucide-react";
 import MarkdownContentWithIds from "@/components/MarkdownContentWithIds";
-import DetailPageWithToc from "@/components/DetailPageWithToc";
+import TableOfContents from "@/components/TableOfContents";
 import PdfAttachment from "@/components/PdfAttachment";
 import { extractToc } from "@/lib/toc-utils";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -60,12 +60,13 @@ export default function BlogDetailPage() {
 
   return (
     <div className="min-h-screen bg-[hsl(var(--surface))]">
-      <header className="sticky top-0 z-40 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-4xl items-center gap-4 px-4 py-4">
+      {/* 顶部导航 - 最高层级，绝对隔离 */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-[hsl(var(--border))] bg-[hsl(var(--surface))]/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-4">
           <button
             type="button"
             onClick={() => router.back()}
-            className="flex items-center gap-1 text-sm text-[hsl(var(--text-muted))] hover:text-[hsl(var(--text))]"
+            className="flex items-center gap-1 text-sm text-[hsl(var(--text-muted))] hover:text-[hsl(var(--text))] transition-colors"
           >
             <ChevronLeft className="h-5 w-5" />
             返回
@@ -73,42 +74,44 @@ export default function BlogDetailPage() {
         </div>
       </header>
 
-      <DetailPageWithToc toc={toc}>
-        <div className="mx-auto max-w-3xl px-4 py-8">
-          {coverImage && (
-            <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-2xl">
-              {isDataUrl ? (
-                <img src={coverImage} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <Image src={coverImage} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
-              )}
-            </div>
-          )}
-
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[hsl(var(--text-muted))]">
-            {(blog.readTime ?? 0) > 0 && (
-              <span>{lang === "zh" ? `${blog.readTime} 分钟阅读` : `${blog.readTime} min read`}</span>
-            )}
-            {blog.createdAt && (
-              <>
-                {(blog.readTime ?? 0) > 0 && <span>·</span>}
-                <span>{formatDate(blog.createdAt, lang)}</span>
-              </>
+      {/* 主容器 - 沉浸式阅读，居中 */}
+      <main className="mx-auto max-w-3xl px-4 pt-20 pb-16">
+        {coverImage && (
+          <div className="relative mb-8 aspect-video w-full overflow-hidden rounded-2xl">
+            {isDataUrl ? (
+              <img src={coverImage} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <Image src={coverImage} alt="" fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" />
             )}
           </div>
+        )}
 
-          <article className="mt-8">
-            <MarkdownContentWithIds content={content} />
-          </article>
-
-          {blog.pdfData && (
-            <div className="mt-12">
-              <PdfAttachment pdfData={blog.pdfData} pdfName={blog.pdfName || "document.pdf"} />
-            </div>
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-[hsl(var(--text-muted))]">
+          {(blog.readTime ?? 0) > 0 && (
+            <span>{lang === "zh" ? `${blog.readTime} 分钟阅读` : `${blog.readTime} min read`}</span>
+          )}
+          {blog.createdAt && (
+            <>
+              {(blog.readTime ?? 0) > 0 && <span>·</span>}
+              <span>{formatDate(blog.createdAt, lang)}</span>
+            </>
           )}
         </div>
-      </DetailPageWithToc>
+
+        <article className="mt-8 [&_h2]:scroll-mt-24 [&_h3]:scroll-mt-24">
+          <MarkdownContentWithIds content={content} />
+        </article>
+
+        {blog.pdfData && (
+          <div className="mt-12">
+            <PdfAttachment pdfData={blog.pdfData} pdfName={blog.pdfName || "document.pdf"} />
+          </div>
+        )}
+      </main>
+
+      {/* TOC - 独立挂载，不干扰布局 */}
+      <TableOfContents toc={toc} />
     </div>
   );
 }
