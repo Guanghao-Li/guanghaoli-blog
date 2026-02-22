@@ -40,6 +40,8 @@ export interface CmsData {
     order?: number;
     coverImage?: string;
     readTime?: number;
+    pdfData?: string;
+    pdfName?: string;
     createdAt?: string;
     updatedAt?: string;
     markdownEn?: string;
@@ -50,6 +52,24 @@ export interface CmsData {
       titleLeftOffsetPercent?: number;
       contentWidthPercent?: number;
     };
+  }>;
+  blogs: Array<{
+    id: string;
+    title: string;
+    titleZh: string;
+    description: string;
+    descriptionZh: string;
+    contentEn: string;
+    contentZh: string;
+    coverImage?: string;
+    colSpan?: number;
+    rowSpan?: number;
+    order?: number;
+    readTime?: number;
+    pdfData?: string;
+    pdfName?: string;
+    createdAt?: string;
+    updatedAt?: string;
   }>;
   iot: {
     title: string;
@@ -106,6 +126,7 @@ export const DEFAULT_DATA: CmsData = {
     paperStyle: DEFAULT_PAPER_STYLE,
   },
   projects: PROJECTS,
+  blogs: [],
   iot: {
     title: "IoT Dashboard",
     titleZh: "IoT Dashboard",

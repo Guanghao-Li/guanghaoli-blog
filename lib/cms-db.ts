@@ -3,6 +3,7 @@ import { DEFAULT_DATA } from "./data-store";
 import { getHeroDoc, upsertHero } from "@/models/Hero";
 import { getResumeDoc, upsertResume } from "@/models/Resume";
 import { getProjects, replaceProjects } from "@/models/Project";
+import { getBlogs, replaceBlogs } from "@/models/Blog";
 import { getIotDoc, upsertIot } from "@/models/Iot";
 import { getDashboardDoc, upsertDashboard } from "@/models/Dashboard";
 
@@ -60,6 +61,8 @@ function toProjectsPayload(projects: CmsData["projects"]) {
     order: p.order ?? 0,
     coverImage: p.coverImage ?? "",
     readTime: p.readTime ?? 0,
+    pdfData: p.pdfData ?? "",
+    pdfName: p.pdfName ?? "",
     markdownEn: p.markdownEn ?? p.markdown ?? "",
     markdownZh: p.markdownZh ?? p.markdown ?? "",
     ...(p.uiSettings && { uiSettings: p.uiSettings }),
@@ -78,6 +81,28 @@ function toIotPayload(iot: CmsData["iot"]) {
   };
 }
 
+function toBlogsPayload(blogs: CmsData["blogs"]) {
+  const now = new Date();
+  return (blogs ?? DEFAULT_DATA.blogs).map((b) => ({
+    id: b.id,
+    title: b.title ?? "",
+    titleZh: b.titleZh ?? "",
+    description: b.description ?? "",
+    descriptionZh: b.descriptionZh ?? "",
+    contentEn: b.contentEn ?? "",
+    contentZh: b.contentZh ?? "",
+    coverImage: b.coverImage ?? "",
+    colSpan: b.colSpan ?? 1,
+    rowSpan: b.rowSpan ?? 1,
+    order: b.order ?? 0,
+    readTime: b.readTime ?? 0,
+    pdfData: b.pdfData ?? "",
+    pdfName: b.pdfName ?? "",
+    createdAt: b.createdAt ? new Date(b.createdAt) : now,
+    updatedAt: now,
+  }));
+}
+
 function toDashboardPayload(dashboard: CmsData["dashboard"]) {
   return {
     widgets: (dashboard?.widgets ?? DEFAULT_DATA.dashboard.widgets).map((w) => ({
@@ -92,10 +117,11 @@ function toDashboardPayload(dashboard: CmsData["dashboard"]) {
 }
 
 export async function loadCmsData(): Promise<CmsData> {
-  const [heroDoc, resumeDoc, projectDocs, iotDoc, dashboardDoc] = await Promise.all([
+  const [heroDoc, resumeDoc, projectDocs, blogDocs, iotDoc, dashboardDoc] = await Promise.all([
     getHeroDoc(),
     getResumeDoc(),
     getProjects(),
+    getBlogs(),
     getIotDoc(),
     getDashboardDoc(),
   ]);
@@ -156,6 +182,8 @@ export async function loadCmsData(): Promise<CmsData> {
             order: rest.order ?? 0,
             coverImage: rest.coverImage ?? "",
             readTime: rest.readTime ?? 0,
+            pdfData: rest.pdfData ?? "",
+            pdfName: rest.pdfName ?? "",
             createdAt: rest.createdAt ? new Date(rest.createdAt).toISOString() : undefined,
             updatedAt: rest.updatedAt ? new Date(rest.updatedAt).toISOString() : undefined,
             markdownEn: rest.markdownEn ?? "",
@@ -164,6 +192,31 @@ export async function loadCmsData(): Promise<CmsData> {
           };
         })
       : DEFAULT_DATA.projects;
+
+  const blogs =
+    blogDocs && blogDocs.length > 0
+      ? blogDocs.map((b: any) => {
+          const { _id, ...rest } = b;
+          return {
+            id: rest.id,
+            title: rest.title ?? "",
+            titleZh: rest.titleZh ?? "",
+            description: rest.description ?? "",
+            descriptionZh: rest.descriptionZh ?? "",
+            contentEn: rest.contentEn ?? "",
+            contentZh: rest.contentZh ?? "",
+            coverImage: rest.coverImage ?? "",
+            colSpan: rest.colSpan ?? 1,
+            rowSpan: rest.rowSpan ?? 1,
+            order: rest.order ?? 0,
+            readTime: rest.readTime ?? 0,
+            pdfData: rest.pdfData ?? "",
+            pdfName: rest.pdfName ?? "",
+            createdAt: rest.createdAt ? new Date(rest.createdAt).toISOString() : undefined,
+            updatedAt: rest.updatedAt ? new Date(rest.updatedAt).toISOString() : undefined,
+          };
+        })
+      : DEFAULT_DATA.blogs;
 
   const iot = iotDoc
     ? {
@@ -188,7 +241,7 @@ export async function loadCmsData(): Promise<CmsData> {
       }
     : DEFAULT_DATA.dashboard;
 
-  return { hero, resume, projects, iot, dashboard };
+  return { hero, resume, projects, blogs, iot, dashboard };
 }
 
 export async function saveCmsData(data: CmsData): Promise<void> {
@@ -196,6 +249,7 @@ export async function saveCmsData(data: CmsData): Promise<void> {
     upsertHero(toHeroPayload(data.hero)),
     upsertResume(toResumePayload(data.resume)),
     replaceProjects(toProjectsPayload(data.projects)),
+    replaceBlogs(toBlogsPayload(data.blogs)),
     upsertIot(toIotPayload(data.iot)),
     upsertDashboard(toDashboardPayload(data.dashboard)),
   ]);

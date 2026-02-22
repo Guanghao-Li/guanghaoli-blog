@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, FileText, FolderOpen, Settings, Cpu, LayoutGrid, Menu, X } from "lucide-react";
+import { User, FileText, FolderOpen, Settings, Cpu, LayoutGrid, Menu, X, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/admin", label: "首页", icon: User },
   { href: "/admin/resume", label: "简历管理", icon: FileText },
   { href: "/admin/projects", label: "项目展示", icon: FolderOpen },
+  { href: "/admin/blog", label: "博客管理", icon: BookOpen },
   { href: "/admin/dashboard", label: "仪表盘组件", icon: LayoutGrid },
   { href: "/admin/iot", label: "IoT 配置", icon: Cpu },
 ];

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import CompressedImageInput from "./CompressedImageInput";
+import PdfFileInput from "@/components/PdfFileInput";
 
 const TITLE_SIZE_OPTIONS = [
   { value: "text-2xl md:text-3xl", label: "2xl / 3xl (默认)" },
@@ -70,6 +71,8 @@ export default function ProjectsManager() {
         readTime: 0,
         markdownEn: "## Overview\n\nWrite project introduction.\n\n### Code Sample\n\n```typescript\nconst x = 1;\n```",
         markdownZh: "## 项目概述\n\n在此编写项目介绍。\n\n### 代码示例\n\n```typescript\nconst x = 1;\n```",
+        pdfData: "",
+        pdfName: "",
         uiSettings: {},
       },
     ]);
@@ -256,6 +259,13 @@ export default function ProjectsManager() {
                     })
                   }
                   className="mt-0.5 w-full rounded border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-zinc-500 mb-1">PDF 附件</label>
+                <PdfFileInput
+                  value={p.pdfName ?? ""}
+                  onChange={(base64, name) => updateProject(p.id, { pdfData: base64, pdfName: name })}
                 />
               </div>
               {/* UI 微调折叠面板 */}

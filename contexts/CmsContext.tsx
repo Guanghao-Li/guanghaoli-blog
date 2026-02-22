@@ -56,8 +56,28 @@ export interface IotData {
   };
 }
 
+export interface Blog {
+  id: string;
+  title: string;
+  titleZh: string;
+  description: string;
+  descriptionZh: string;
+  contentEn: string;
+  contentZh: string;
+  coverImage?: string;
+  colSpan?: number;
+  rowSpan?: number;
+  order?: number;
+  readTime?: number;
+  pdfData?: string;
+  pdfName?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 interface CmsDataResponse {
   projects?: Project[];
+  blogs?: Blog[];
   resume?: ResumeData;
   hero?: HeroData;
   dashboard?: { widgets: DashboardWidget[] };
@@ -66,6 +86,7 @@ interface CmsDataResponse {
 
 const CmsContext = createContext<{
   projects: Project[];
+  blogs: Blog[];
   resume: ResumeData | null;
   hero: HeroData | null;
   dashboard: { widgets: DashboardWidget[] };
@@ -77,6 +98,7 @@ const DEFAULT_DASHBOARD = { widgets: [] as DashboardWidget[] };
 
 export function CmsProvider({ children }: { children: React.ReactNode }) {
   const [projects, setProjects] = useState<Project[]>(PROJECTS);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
   const [resume, setResume] = useState<ResumeData | null>(null);
   const [hero, setHero] = useState<HeroData | null>(null);
   const [dashboard, setDashboard] = useState<{ widgets: DashboardWidget[] }>(DEFAULT_DASHBOARD);
@@ -89,6 +111,9 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
       const data: CmsDataResponse = await res.json();
       if (Array.isArray(data.projects) && data.projects.length > 0) {
         setProjects(data.projects as Project[]);
+      }
+      if (Array.isArray(data.blogs)) {
+        setBlogs(data.blogs as Blog[]);
       }
       if (data.resume) {
         setResume(data.resume);
@@ -112,7 +137,7 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   return (
-    <CmsContext.Provider value={{ projects, resume, hero, dashboard, iot, refresh }}>
+    <CmsContext.Provider value={{ projects, blogs, resume, hero, dashboard, iot, refresh }}>
       {children}
     </CmsContext.Provider>
   );
@@ -121,6 +146,11 @@ export function CmsProvider({ children }: { children: React.ReactNode }) {
 export function useCmsProjects() {
   const ctx = useContext(CmsContext);
   return ctx?.projects ?? PROJECTS;
+}
+
+export function useCmsBlogs() {
+  const ctx = useContext(CmsContext);
+  return ctx?.blogs ?? [];
 }
 
 export function useCmsResume(): ResumeData | null {

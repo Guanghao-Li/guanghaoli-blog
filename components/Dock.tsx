@@ -1,20 +1,17 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { Home, FileText, FolderOpen, FlaskConical } from "lucide-react";
+import { motion } from "framer-motion";
+import { Home, FileText, FolderOpen, BookOpen, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useProjectDetail } from "@/contexts/ProjectDetailContext";
-
 const NAV_ITEMS = [
   { id: "hero", label: "Home", icon: Home, href: "#hero" },
   { id: "resume", label: "Resume", icon: FileText, href: "#resume" },
   { id: "projects", label: "Projects", icon: FolderOpen, href: "#projects" },
+  { id: "blog", label: "Blog", icon: BookOpen, href: "#blog" },
   { id: "lab", label: "Lab", icon: FlaskConical, href: "#lab" },
 ];
 
 export default function Dock() {
-  const { selectedId } = useProjectDetail();
-  const isProjectOpen = Boolean(selectedId);
 
   const handleClick = (href: string) => {
     const el = document.querySelector(href);
@@ -22,9 +19,7 @@ export default function Dock() {
   };
 
   return (
-    <AnimatePresence mode="wait">
-      {!isProjectOpen && (
-        <motion.nav
+    <motion.nav
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -59,7 +54,5 @@ export default function Dock() {
         })}
           </div>
         </motion.nav>
-      )}
-    </AnimatePresence>
   );
 }

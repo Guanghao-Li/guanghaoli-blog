@@ -10,9 +10,9 @@ import {
   useMemo,
 } from "react";
 
-export type SectionId = "hero" | "resume" | "projects" | "lab";
+export type SectionId = "hero" | "resume" | "projects" | "blog" | "lab";
 
-const SECTION_ORDER: SectionId[] = ["hero", "resume", "projects", "lab"];
+const SECTION_ORDER: SectionId[] = ["hero", "resume", "projects", "blog", "lab"];
 
 interface ScrollSectionContextType {
   activeSection: SectionId;
@@ -33,6 +33,7 @@ export function ScrollSectionProvider({
     hero: null,
     resume: null,
     projects: null,
+    blog: null,
     lab: null,
   });
 

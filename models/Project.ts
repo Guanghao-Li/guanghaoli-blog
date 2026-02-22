@@ -28,6 +28,8 @@ const ProjectSchema = new mongoose.Schema(
     markdownZh: { type: String, default: "" },
     markdown: { type: String, default: undefined },
     uiSettings: UiSettingsSchema,
+    pdfData: { type: String, default: "" },
+    pdfName: { type: String, default: "" },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
   },
@@ -40,6 +42,11 @@ const Project =
 export async function getProjects() {
   await connectDB();
   return Project.find().sort({ order: 1, id: 1 }).lean();
+}
+
+export async function getProjectById(id: string) {
+  await connectDB();
+  return Project.findOne({ id }).lean();
 }
 
 export async function replaceProjects(projects: any[]) {
