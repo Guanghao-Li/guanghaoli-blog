@@ -8,13 +8,38 @@ interface CircularAngleRangePickerProps {
   size?: number;
 }
 
-/** 0° = 右侧, 90° = 上方, 逆时针增加。屏幕 y 向下为正，故 y = cy - r*sin */
-function polarToXY(deg: number, r: number, cx: number, cy: number) {
-  const rad = (deg * Math.PI) / 180;
+/** 0° = 正右方, 90° = 正上方, 180° = 正左方, 270° = 正下方。Y 轴反转以适配屏幕坐标系与物理引擎 */
+function polarToCartesian(
+  centerX: number,
+  centerY: number,
+  radius: number,
+  angleInDegrees: number
+) {
+  const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
   return {
-    x: cx + r * Math.cos(rad),
-    y: cy - r * Math.sin(rad),
+    x: centerX + radius * Math.cos(angleInRadians),
+    y: centerY - radius * Math.sin(angleInRadians),
   };
+}
+
+function describeArc(
+  x: number,
+  y: number,
+  radius: number,
+  startAngle: number,
+  endAngle: number
+): string {
+  const start = polarToCartesian(x, y, radius, endAngle);
+  const end = polarToCartesian(x, y, radius, startAngle);
+  const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+  const d = [
+    "M", x, y,
+    "L", start.x, start.y,
+    "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+    "Z",
+  ].join(" ");
+  return d;
 }
 
 export default function CircularAngleRangePicker({
@@ -22,39 +47,62 @@ export default function CircularAngleRangePicker({
   maxAngle,
   onMinChange,
   onMaxChange,
-  size = 140,
+  size = 192,
 }: CircularAngleRangePickerProps) {
-  const r = size / 2 - 8;
   const cx = size / 2;
   const cy = size / 2;
+  const radius = size / 2 - 12;
 
   const startDeg = Math.min(minAngle, maxAngle);
   const endDeg = Math.max(minAngle, maxAngle);
-  const sweep = endDeg - startDeg;
-  const largeArc = sweep > 180 ? 1 : 0;
-
-  const p1 = polarToXY(startDeg, r, cx, cy);
-  const p2 = polarToXY(endDeg, r, cx, cy);
-
-  const d = `M ${cx} ${cy} L ${p1.x} ${p1.y} A ${r} ${r} 0 ${largeArc} 0 ${p2.x} ${p2.y} Z`;
+  const sectorD = describeArc(cx, cy, radius, startDeg, endDeg);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
+      {/* 可视化雷达区域 */}
       <div className="flex justify-center">
-        <svg
-          width={size}
-          height={size}
-          viewBox={`0 0 ${size} ${size}`}
-          className="rounded-full border border-zinc-300 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900"
-        >
-          <circle cx={cx} cy={cy} r={r} fill="none" stroke="currentColor" strokeWidth="1" className="text-zinc-300 dark:text-zinc-600" />
-          <path d={d} fill="hsl(var(--accent))" fillOpacity={0.4} stroke="hsl(var(--accent))" strokeWidth="1" />
-          <line x1={cx} y1={cy} x2={cx + r} y2={cy} stroke="currentColor" strokeWidth="1" strokeDasharray="4" className="text-zinc-400 dark:text-zinc-500" />
-        </svg>
+        <div className="w-48 h-48 shrink-0">
+          <svg
+            width={size}
+            height={size}
+            viewBox={`0 0 ${size} ${size}`}
+            className="rounded-full border border-zinc-200 bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900/50"
+          >
+            {/* 虚线圆 - 360° 全域 */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={radius}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeDasharray="6 4"
+              className="text-zinc-300 dark:text-zinc-600"
+            />
+            {/* 发射区域扇形 */}
+            <path
+              d={sectorD}
+              className="fill-blue-500/30 stroke-blue-500 stroke-2"
+              strokeLinejoin="round"
+            />
+            {/* 中心小圆点 - 代表头像 */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={4}
+              fill="currentColor"
+              className="text-zinc-500 dark:text-zinc-400"
+            />
+          </svg>
+        </div>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+
+      {/* 控制中枢 */}
+      <div className="space-y-4">
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">minAngle (°) {minAngle}</label>
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+            最小角度: {minAngle}°
+          </label>
           <input
             type="range"
             min={0}
@@ -62,11 +110,13 @@ export default function CircularAngleRangePicker({
             step={5}
             value={minAngle}
             onChange={(e) => onMinChange(Number(e.target.value))}
-            className="w-full h-2 rounded-lg accent-zinc-700"
+            className="w-full h-2 rounded-lg accent-blue-500"
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-zinc-500 mb-1">maxAngle (°) {maxAngle}</label>
+          <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+            最大角度: {maxAngle}°
+          </label>
           <input
             type="range"
             min={0}
@@ -74,7 +124,7 @@ export default function CircularAngleRangePicker({
             step={5}
             value={maxAngle}
             onChange={(e) => onMaxChange(Number(e.target.value))}
-            className="w-full h-2 rounded-lg accent-zinc-700"
+            className="w-full h-2 rounded-lg accent-blue-500"
           />
         </div>
       </div>

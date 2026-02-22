@@ -275,7 +275,6 @@ export default function HeroSettings() {
               maxAngle={maxAngle}
               onMinChange={(v) => { setMinAngle(v); setDirty(true); }}
               onMaxChange={(v) => { setMaxAngle(v); setDirty(true); }}
-              size={140}
             />
           </div>
           <div>
