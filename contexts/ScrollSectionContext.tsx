@@ -9,6 +9,7 @@ import {
   useCallback,
   useMemo,
 } from "react";
+import { usePathname } from "next/navigation";
 
 export type SectionId = "hero" | "resume" | "projects" | "blog" | "lab";
 
@@ -29,6 +30,7 @@ export function ScrollSectionProvider({
   children: React.ReactNode;
 }) {
   const [activeSection, setActiveSection] = useState<SectionId>("hero");
+  const pathname = usePathname();
   const sectionRefs = useRef<Record<SectionId, HTMLElement | null>>({
     hero: null,
     resume: null,
@@ -81,7 +83,7 @@ export function ScrollSectionProvider({
         window.removeEventListener("scroll", run);
       }
     };
-  }, []);
+  }, [pathname]);
 
   const value = useMemo(
     () => ({
